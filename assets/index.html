@@ -170,7 +170,7 @@
           <li class="nav-item border-dashed">
             <a href="index.html" class="nav-link d-flex align-items-center gap-3 text-dark p-2">
               <svg width="24" height="24" viewBox="0 0 24 24"><use xlink:href="#user"></use></svg>
-              <span>About This</span>
+              <span id="userNameNav">About This</span>
             </a>
           
           </li>
@@ -240,10 +240,14 @@
               <li>
                 <a href="#" class="p-2 mx-1">
                   <svg width="24" height="24"><use xlink:href="#user"></use></svg>
+                  <span id="userNameIcon" style="font-weight:bold; margin-left:4px;"></span>
                 </a>
               </li>
               <li>
-                <a href="#" class="p-2 mx-1">
+                <a id="logoutBtn" href="#" class="p-2 mx-1" style="display:none;">
+                  <span style="font-weight:bold; color:#d9534f;">Cerrar sesión</span>
+                </a>
+                <a id="wishlistBtn" href="#" class="p-2 mx-1">
                   <svg width="24" height="24"><use xlink:href="#wishlist"></use></svg>
                 </a>
               </li>
@@ -270,7 +274,51 @@
             <h2 class="display-1 ls-1"><span class="fw-bold text-primary">Clemenss</span> El Arte de seducir en cada <span class="fw-bold">Aroma</span></h2>
             <!--<p class="fs-4">Dignissim massa diam elementum.</p>-->
             <div class="d-flex gap-3">
-                <a href="#" class="btn btn-primary text-uppercase fs-6 rounded-pill px-4 py-3 mt-3">Inicia Compras</a>
+                  <a id="loginBtn" href="login.html" class="btn btn-primary text-uppercase fs-6 rounded-pill px-4 py-3 mt-3">Inicia Sesión</a>
+<script>
+  // Chequeo inmediato por si el usuario ya está autenticado
+  (function() {
+    try {
+      var raw = localStorage.getItem('app.jwt');
+      var isLogged = false;
+      if (raw) {
+        var s = JSON.parse(raw);
+        if (s && s.user && s.user.name) {
+          isLogged = true;
+          var btn = document.getElementById('loginBtn');
+          if (btn) {
+            btn.textContent = 'Hola, ' + s.user.name;
+            btn.href = '#';
+          }
+          var userNameNav = document.getElementById('userNameNav');
+          if (userNameNav) {
+            userNameNav.textContent = s.user.name;
+          }
+          var userNameIcon = document.getElementById('userNameIcon');
+          if (userNameIcon) {
+            userNameIcon.textContent = s.user.name;
+          }
+        }
+      }
+      var logoutBtn = document.getElementById('logoutBtn');
+      var wishlistBtn = document.getElementById('wishlistBtn');
+      if (isLogged) {
+        if (logoutBtn) logoutBtn.style.display = 'inline-block';
+        if (wishlistBtn) wishlistBtn.style.display = 'none';
+        if (logoutBtn) {
+          logoutBtn.onclick = function(e) {
+            e.preventDefault();
+            localStorage.removeItem('app.jwt');
+            window.location.reload();
+          };
+        }
+      } else {
+        if (logoutBtn) logoutBtn.style.display = 'none';
+        if (wishlistBtn) wishlistBtn.style.display = 'inline-block';
+      }
+    } catch(e) {}
+  })();
+</script>
                 <a href="register.html" class="btn btn-dark text-uppercase fs-6 rounded-pill px-4 py-3 mt-3">Registrate</a>
             </div>
             <div class="row my-5">
@@ -1540,14 +1588,21 @@ document.querySelectorAll('a[href="#para-el"]').forEach(function(link) {
 <!-- en tu index.html, antes de </body> -->
 <script src="auth.js" defer></script>
 
-<script src="auth.js" defer></script>
+
 <script>
-  document.addEventListener('DOMContentLoaded', () => {
-    // 👇 Esto fuerza login: si no hay sesión, redirige a login.html
-    Auth.requireAuth({ loginUrl: 'login.html' });
+  window.addEventListener('DOMContentLoaded', () => {
+    function updateLoginBtn() {
+      if (!window.Auth) return setTimeout(updateLoginBtn, 50);
+      const session = window.Auth.getSession();
+      const loginBtn = document.getElementById('loginBtn');
+      if (session && session.user && loginBtn) {
+        loginBtn.textContent = `Hola, ${session.user.name}`;
+        loginBtn.href = '#';
+      }
+    }
+    updateLoginBtn();
   });
 </script>
-<span data-user-name></span>
 
 
 
