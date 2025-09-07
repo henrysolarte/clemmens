@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Clemenss Perfumería - Productos</title>
+    <link rel="icon" type="image/x-icon" href="images/logo.png">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/normalize.css">
+    <link rel="stylesheet" href="css/vendor.css">
+</head>
+<body>
+    <header class="header">
+        <div class="header__logo">
+            <a href="index.html"><img src="images/logo.png" alt="Logo Clemenss Perfumería" width="150" height="150"></a>
+        </div>
+        <nav class="header__nav">
+            <ul class="header__nav-list">
+                <li><a href="index.html" class="header__nav-link">Inicio</a></li>
+                <li><a href="#para-ella" class="header__nav-link">Para ella</a></li>
+                <li><a href="#para-el" class="header__nav-link">Para él</a></li>
+                <li><a href="carrito.html" class="header__nav-link">Carrito</a></li>
+                <li><a href="#contacto" class="header__nav-link">Contacto</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main class="container-lg py-5">
+        <h2 class="section-title">Perfumes Clemenss</h2>
+        <div id="productos-lista" class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+            <!-- Los productos se insertan aquí por JS -->
+        </div>
+    </main>
+    <footer>
+        <div class="footer__content">
+            <p>&copy; 2025 Clemenss Perfumería. Todos los derechos reservados.</p>
+            <div class="footer__links">
+                <a href="index.html">Inicio</a> |
+                <a href="#para-ella">Para ella</a> |
+                <a href="#para-el">Para él</a> |
+                <a href="carrito.html">Carrito</a> |
+                <a href="#contacto">Contacto</a>
+            </div>
+        </div>
+    </footer>
+    <script src="js/carrito.js"></script>
+    <script src="js/productos.js"></script>
+</body>
+</html>
