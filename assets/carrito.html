@@ -22,6 +22,7 @@
             padding-bottom: 15px;
             font-family: 'Montserrat', sans-serif;
             color: #324f5c;
+            clear: both;
         }
         .carrito__productos {
             display: flex;
@@ -150,6 +151,10 @@
         .header .display-1 {
             font-size: 4rem;
         }
+        .carrito__seguir-comprando {
+            float: left;
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 <body>
@@ -181,6 +186,7 @@
     </header>
     <section>
         <div class="carrito">
+            <button class="carrito__seguir-comprando" onclick="window.location.href='index.html'">home</button>
             <h2 class="carrito__titulo">Tu Carrito</h2>
             <div class="carrito__productos">
                 <div id="carrito-lista"></div>
