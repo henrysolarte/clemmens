@@ -205,6 +205,11 @@ function renderProductos() {
   document.querySelectorAll('.btn-cart').forEach(btn => {
     btn.addEventListener('click', function(e) {
       e.preventDefault();
+      if (!usuarioLogueado()) {
+        alert('Debes iniciar sesión para agregar productos al carrito.');
+        window.location.href = 'login.html';
+        return;
+      }
       const idx = this.getAttribute('data-idx');
       const cantidad = parseInt(document.getElementById(`qty-prod-${idx}`).value) || 1;
       const producto = productos[idx];
@@ -231,6 +236,17 @@ function renderProductos() {
     });
   });
   console.log('Botones Add to Cart listos y eventos asignados.');
+}
+
+function usuarioLogueado() {
+  try {
+    const session = localStorage.getItem('app.jwt');
+    if (!session) return false;
+    const obj = JSON.parse(session);
+    return !!(obj && obj.token);
+  } catch {
+    return false;
+  }
 }
 
 document.addEventListener('DOMContentLoaded', renderProductos);

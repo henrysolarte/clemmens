@@ -1522,9 +1522,24 @@
       
 
   // Asignar eventos a los botones Add to Cart en index.html
+  function usuarioLogueado() {
+    try {
+      const session = localStorage.getItem('app.jwt');
+      if (!session) return false;
+      const obj = JSON.parse(session);
+      return !!(obj && obj.token);
+    } catch {
+      return false;
+    }
+  }
   document.querySelectorAll('.btn-cart').forEach((btn, idx) => {
     btn.addEventListener('click', function(e) {
       e.preventDefault();
+      if (!usuarioLogueado()) {
+        alert('Debes iniciar sesión para agregar productos al carrito.');
+        window.location.href = 'login.html';
+        return;
+      }
       // Buscar el nombre y precio del producto en el DOM
       const card = btn.closest('.product-item');
       const nombre = card.querySelector('h3').textContent.trim();
