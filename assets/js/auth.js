@@ -187,3 +187,4 @@ function logout(redirectTo = "/login.html") {
  * ========================= */
 window.Auth = { requireAuth, logout, getSession };
 document.addEventListener("DOMContentLoaded", attachLoginHandler);
+git
