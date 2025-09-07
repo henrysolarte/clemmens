@@ -1,8 +1,4 @@
-  if (window.location.port === "5500") {
-  // Redirección eliminada para permitir carga normal del frontend
-  }
-
-    <meta charset="utf-8">
+<meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="format-detection" content="telephone=no">
@@ -230,9 +226,16 @@
             <li class="nav-item active">
                 <a href="carrito.html" class="nav-link">Carrito</a>
               </li>
-              <li class
-
-            
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button" id="offers" data-bs-toggle="dropdown" aria-expanded="false">
+                  Ofertas
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="offers">
+                  <li><a class="dropdown-item" href="#">Descuentos</a></li>
+                  <li><a class="dropdown-item" href="#">Cupones</a></li>
+                  <li><a class="dropdown-item" href="#">Combos</a></li>
+                </ul>
+              </li>
             </ul>
           </div>
           
@@ -1619,7 +1622,7 @@ document.querySelectorAll('a[href="#para-el"]').forEach(function(link) {
   });
 </script>
 
-
+<div id="mensaje" style="display:none;position:fixed;top:30px;left:50%;transform:translateX(-50%);background:#324f5c;color:#fff;padding:12px 32px;border-radius:8px;z-index:9999;font-size:1.2rem;box-shadow:0 2px 8px rgba(0,0,0,0.15);"></div>
 
 </body>
 </html>

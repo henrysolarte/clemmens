@@ -139,35 +139,61 @@
         .carrito__pagar:hover {
             background-color: #92d995;
         }
+        .header .container-lg {
+            min-height: 300px;
+            height: 20vh;
+            max-width: 50vw;
+            display: flex;
+            align-items: left
+            justify-content: center;
+        }
+        .header .display-1 {
+            font-size: 4rem;
+        }
     </style>
 </head>
 <body>
     <header class="header">
-        <div class="header__logo">
-            <a href="index.html"><img src="images/logo.png" alt="Logo Clemenss Perfumería" width="150" height="150"></a>
+      <section style="background-image: url('images/banner-2.jpg');background-repeat: no-repeat;background-size: cover;">
+        <div class="container-lg">
+          <div class="row">
+            <div class="col-lg-6 pt-5 mt-5">
+              <h2 class="display-1 ls-1 text-start" style="text-align:left !important;">
+  <span class="fw-bold text-primary">Clemenss</span><br>
+  El Arte de seducir en cada<br>
+  <span class="fw-bold">Aroma</span>
+</h2>
+              <!--<p class="fs-4">Dignissim massa diam elementum.</p>-->
+              <div class="d-flex gap-3">
+                
+                        
+            </div>
+            </div>
+          </div>
         </div>
-        <nav class="header__nav">
-            <ul class="header__nav-list">
-                <li><a href="index.html" class="header__nav-link">Inicio</a></li>
-                <li><a href="#para-ella" class="header__nav-link">Para ella</a></li>
-                <li><a href="#para-el" class="header__nav-link">Para él</a></li>
-              
-            </ul>
-        </nav>
+      </section>
+      <div class="header__logo">
+      
+      </div>
+      <nav class="header__nav">
+         
+      </nav>
     </header>
-    <section class="carrito">
-        <h2 class="carrito__titulo">Tu Carrito</h2>
-        <div class="carrito__productos">
-            <div id="carrito-lista"></div>
-        </div>
-        <div class="carrito_total">
-            <p>Subtotal: <span id="subtotal">$0</span></p>
-            <p>IVA (19%): <span id="iva">$0</span></p>
-            <p>Total: <span id="total">$0</span></p>
-        </div>
-        <div>
-            <button class="carrito__seguir-comprando" onclick="window.location.href='index.html'">Seguir comprando</button>
-            <button class="carrito__pagar">Pagar</button>
+    <section>
+        <div class="carrito">
+            <h2 class="carrito__titulo">Tu Carrito</h2>
+            <div class="carrito__productos">
+                <div id="carrito-lista"></div>
+            </div>
+            <div class="carrito_total">
+                <p>Subtotal: <span id="subtotal">$0</span></p>
+                <p>IVA (19%): <span id="iva">$0</span></p>
+                <p>Total: <span id="total">$0</span></p>
+            </div>
+            <div>
+                <button class="carrito__seguir-comprando" onclick="window.location.href='index.html'">Seguir comprando</button>
+                <button class="carrito__pagar">Pagar</button>
+            </div>
         </div>
     </section>
     <div class="mensaje" id="mensaje"></div>

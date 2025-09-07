@@ -215,6 +215,19 @@ function renderProductos() {
         imagen: producto.imagen,
         cantidad: cantidad
       });
+      // Mostrar mensaje en index.html
+      const mensaje = document.getElementById('mensaje');
+      if (mensaje) {
+        mensaje.textContent = 'Producto agregado al carrito.';
+        mensaje.style.display = 'block';
+        setTimeout(() => { mensaje.style.display = 'none'; }, 2500);
+      }
+      // Actualizar carrito.html si está abierto
+      if (window.location.pathname.includes('carrito.html')) {
+        if (typeof mostrarCarrito === 'function') {
+          mostrarCarrito();
+        }
+      }
     });
   });
   console.log('Botones Add to Cart listos y eventos asignados.');

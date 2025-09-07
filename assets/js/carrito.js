@@ -66,3 +66,11 @@ function mostrarMensaje(texto) {
         mensaje.style.display = "none";
     }, 3000);
 }
+
+// Actualiza el carrito automáticamente si se agrega un producto desde otra pestaña o ventana
+window.addEventListener('storage', function(e) {
+  if (e.key === 'carrito') {
+    mostrarCarrito();
+    mostrarMensaje('Producto agregado al carrito');
+  }
+});
