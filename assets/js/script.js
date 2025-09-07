@@ -159,6 +159,13 @@
     initProductQty();
     initJarallax();
     initChocolat();
+    // Mostrar botón Add to Cart solo en hover sobre la imagen
+    $('.product-figure').on('mouseenter', function() {
+      $(this).find('.button-area').fadeIn(150);
+    });
+    $('.product-figure').on('mouseleave', function() {
+      $(this).find('.button-area').fadeOut(150);
+    });
 
   }); // End of a document
 

@@ -107,6 +107,7 @@ function attachLoginHandler() {
     try {
       const { token, user } = await apiLogin(email, pass);
       setSession({ token, user });
+      borrarCarritoLocal();
       // Redirige a home o dashboard
       const target = form.dataset.redirect || "/";
       window.location.assign(target);
@@ -115,6 +116,10 @@ function attachLoginHandler() {
       passInput?.classList.add("is-invalid");
     }
   });
+}
+
+function borrarCarritoLocal() {
+  localStorage.removeItem('carrito');
 }
 
 /** =========================
