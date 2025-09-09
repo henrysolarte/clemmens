@@ -169,4 +169,31 @@
 
   }); // End of a document
 
+  // Mostrar modal con detalles del producto (formato visual)
+  window.showProductModal = function(productName) {
+    var producto = window.productos.find(function(p) {
+      return p.nombre.toLowerCase() === productName.toLowerCase();
+    });
+    if (!producto) {
+      alert('Producto no encontrado: ' + productName);
+      return;
+    }
+    var modalHtml = `
+      <div id="productModal" class="modal" style="display:block;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.7);z-index:9999;">
+        <div style="background:#fff;margin:5% auto;padding:32px 24px;max-width:370px;position:relative;border-radius:20px;text-align:center;box-shadow:0 4px 24px rgba(0,0,0,0.15);">
+          <span style="position:absolute;top:18px;right:24px;cursor:pointer;font-size:28px;font-weight:bold;" onclick="document.getElementById('productModal').remove()">&times;</span>
+          <img src="${producto.imagen}" alt="${producto.nombre}" style="width:180px;height:180px;object-fit:cover;border-radius:16px;margin-bottom:18px;">
+          <h2 style="font-size:1.5rem;font-weight:700;margin-bottom:10px;">${producto.nombre}</h2>
+          <p style="font-size:1.1rem;margin-bottom:6px;"><b>Precio:</b> $${producto.precio.toLocaleString()}</p>
+          <p style="font-size:1rem;margin-bottom:6px;"><b>Categoría:</b> ${producto.categoria}</p>
+          <p style="font-size:1rem;color:#2d3a4a;margin-bottom:18px;">${producto.descripcion}</p>
+        </div>
+      </div>
+    `;
+    // Elimina cualquier modal anterior
+    var oldModal = document.getElementById('productModal');
+    if (oldModal) oldModal.remove();
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+  }
+
 })(jQuery);
