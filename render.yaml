@@ -13,12 +13,14 @@ services:
           name: clemmens-db
           property: connectionString
 
-  - type: static
+  - type: web
     name: clemmens
+    env: static
     region: global
     rootDir: .
     buildCommand: ""
-    publishPath: .
+    startCommand: ""
+    staticPublishPath: .
     headers:
       - path: "/*"
         name: "Cache-Control"
