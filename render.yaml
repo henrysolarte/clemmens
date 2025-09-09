@@ -1,0 +1,30 @@
+services:
+  - type: web
+    name: PerfumeriaClemenss
+    env: node
+    region: oregon
+    rootDir: server
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: clemmens-db
+          property: connectionString
+
+  - type: static
+    name: clemmens
+    region: global
+    rootDir: .
+    buildCommand: ""
+    publishPath: .
+    headers:
+      - path: "/*"
+        name: "Cache-Control"
+        value: "public, max-age=60"
+
+databases:
+  - name: clemmens-db
+    region: oregon
+    plan: free
