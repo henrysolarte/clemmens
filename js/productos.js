@@ -308,12 +308,13 @@ function renderProductos() {
   console.log('Botones Add to Cart listos y eventos asignados.');
 }
 
+
 function usuarioLogueado() {
   try {
     const session = localStorage.getItem('app.jwt');
     if (!session) return false;
     const obj = JSON.parse(session);
-    return !!(obj && obj.token);
+    return !!(obj && obj.user && obj.user.name);
   } catch {
     return false;
   }
