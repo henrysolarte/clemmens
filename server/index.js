@@ -1,17 +1,3 @@
-// Endpoint para obtener datos del usuario autenticado (simulado)
-app.get('/api/me', async (req, res) => {
-  // En producción, aquí deberías validar el JWT o la cookie de sesión
-  // Para demo, devolvemos un usuario fijo si se envía email por query
-  const email = req.query.email;
-  if (!email) return res.status(401).json({ error: 'No autenticado' });
-  try {
-    const { rows } = await pool.query('SELECT id, name, email FROM users WHERE email = $1', [email]);
-    if (rows.length === 0) return res.status(404).json({ error: 'Usuario no encontrado' });
-    res.json({ user: rows[0] });
-  } catch (e) {
-    res.status(500).json({ error: e.message });
-  }
-});
 // server/index.js  —  API lista para Render + Postgres
 
 require('dotenv').config();
@@ -141,6 +127,21 @@ app.post('/api/login', async (req, res) => {
     }
     // (Aquí podrías emitir un JWT; por ahora devolvemos datos básicos)
     res.json({ user: { id: user.id, name: user.name, email: user.email } });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+/* ===== Auth: obtener datos del usuario ===== */
+app.get('/api/me', async (req, res) => {
+  // En producción, aquí deberías validar el JWT o la cookie de sesión
+  // Para demo, devolvemos un usuario fijo si se envía email por query
+  const email = req.query.email;
+  if (!email) return res.status(401).json({ error: 'No autenticado' });
+  try {
+    const { rows } = await pool.query('SELECT id, name, email FROM users WHERE email = $1', [email]);
+    if (rows.length === 0) return res.status(404).json({ error: 'Usuario no encontrado' });
+    res.json({ user: rows[0] });
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
