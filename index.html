@@ -1629,9 +1629,16 @@ document.querySelectorAll('a[href="#para-el"]').forEach(function(link) {
       if (session && session.user && loginBtn) {
         loginBtn.textContent = `Hola, ${session.user.name}`;
         loginBtn.href = '#';
+      } else if (loginBtn) {
+        loginBtn.textContent = 'Iniciar sesión';
+        loginBtn.href = 'login.html';
       }
     }
     updateLoginBtn();
+    // También actualizar el botón si cambia el almacenamiento (por ejemplo, tras login)
+    window.addEventListener('storage', function(e) {
+      if (e.key === 'app.jwt') updateLoginBtn();
+    });
   });
 </script>
 
