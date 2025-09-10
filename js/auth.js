@@ -114,8 +114,8 @@ function attachLoginHandler() {
     setLoading(submitBtn, true);
     try {
       const data = await apiLogin(email, password, inFlight.signal);
-      if (data?.token || data?.user) {
-        setSession({ token: data.token, user: data.user });
+      if (data?.user) {
+        setSession({ user: data.user });
       }
       borrarCarritoLocal();
       window.location.assign(redirectTo);
