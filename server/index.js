@@ -9,6 +9,7 @@ const bcrypt = require('bcryptjs');  // <- Este funciona en Render (100% JS)
 
 
 const app = express();
+app.use(express.json()); // Permite recibir JSON en el body
 
 /* ===== CORS: permite tu front de Render (y localhost para pruebas) ===== */
 /* ===== CORS: clemmens (Render) y localhost; preflight explícito ===== */
