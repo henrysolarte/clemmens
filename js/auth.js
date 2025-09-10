@@ -152,7 +152,7 @@ function attachLoginHandler() {
 // ----------------- Protección de páginas -----------------
 function requireAuth(opts = {}) {
   const s = getSession();
-  if (!s || !s.token) {
+  if (!s || !s.user || !s.user.name) {
     const loginPage = opts.loginUrl || "/login.html";
     const next = encodeURIComponent(window.location.pathname + window.location.search);
     window.location.replace(`${loginPage}?next=${next}`);
