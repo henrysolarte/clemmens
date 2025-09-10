@@ -44,72 +44,7 @@
     </div>
   </div>
 
-  <!-- 👇 Usa SIEMPRE la URL de tu API en Render en producción -->
-  <script>
-    // En producción:
-    const API_BASE = "https://perfumeriaclemenss.onrender.com";
-    // Si quisieras que funcione en local automáticamente, podrías detectar el host:
-    // const isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
-    // const API_BASE = isLocal ? "http://localhost:3002" : "https://perfumeriaclemenss.onrender.com";
-  </script>
-
-  <script>
-  (function () {
-    const form = document.getElementById('registerForm');
-    const msg = document.getElementById('registerMsg');
-
-    function showMsg(text, ok=false) {
-      msg.style.display = 'block';
-      msg.className = ok ? 'alert alert-success' : 'alert alert-danger';
-      msg.textContent = text;
-    }
-
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-
-      // Validación Bootstrap simple
-      let valid = true;
-      ['name','email','password'].forEach(id => {
-        const el = document.getElementById(id);
-        if (!el.checkValidity()) { el.classList.add('is-invalid'); valid = false; }
-        else { el.classList.remove('is-invalid'); }
-      });
-      if (!valid) { return; }
-
-      const name = document.getElementById('name').value.trim();
-      const email = document.getElementById('email').value.trim();
-      const password = document.getElementById('password').value;
-
-      showMsg('Enviando…', true);
-
-      try {
-        const resp = await fetch(`${API_BASE}/api/register`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name, email, password })
-        });
-
-        const data = await resp.json().catch(()=> ({}));
-
-        if (!resp.ok) {
-          // 409 = email ya registrado, 400/500 otros
-          showMsg(data.error || `Error al registrar (HTTP ${resp.status})`, false);
-          return;
-        }
-
-        showMsg(`¡Cuenta creada! Bienvenido, ${data.user.name}`, true);
-        form.reset();
-        // Redirigir al login si quieres:
-        // setTimeout(() => location.href = 'login.html', 800);
-      } catch (err) {
-        console.error(err);
-        showMsg('Error de red o CORS. Revisa la consola del navegador.', false);
-      }
-    });
-  })();
-  </script>
-
-  <!-- ⚠️ Quita este include si el archivo también maneja el submit (para evitar doble envío) -->
-  <!-- <script src="js/register.js" defer></script> -->
+  <!-- Script de registro centralizado -->
+  <script src="js/register.js" defer></script>
 </body>
 </html>

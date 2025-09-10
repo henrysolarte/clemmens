@@ -1,4 +1,4 @@
-/* auth.js – autenticación en navegador (prod + local)
+/* auth.js – autenticación y UI en navegador (prod + local)
    - Detecta prod (onrender.com) y usa la API de Render
    - En local usa http://localhost:3002/api si no defines window.__API_URL__
    - NO usa credentials:"include" para evitar CORS estricto
@@ -162,12 +162,64 @@ function requireAuth(opts = {}) {
   if (el) el.textContent = s.user?.name || s.user?.email || "Usuario";
 }
 function logout(redirectTo = "/login.html") {
+  borrarCarritoLocal(); // Es buena práctica limpiar el carrito al cerrar sesión
   clearSession();
   window.location.assign(redirectTo);
 }
 
-// Exponer helpers si los necesitas en otras páginas
-window.Auth = { requireAuth, logout, getSession };
+function updateAuthUI() {
+  const session = getSession();
+  const isLogged = !!(session && session.user && session.user.name);
 
-// Auto-inicializar en páginas con #loginForm
-document.addEventListener("DOMContentLoaded", attachLoginHandler);
+  // Elementos en el header/nav
+  const loginBtn = document.getElementById('loginBtn');
+  const logoutBtn = document.getElementById('logoutBtn');
+  const wishlistBtn = document.getElementById('wishlistBtn');
+  const userNameNav = document.getElementById('userNameNav');
+  const userNameIcon = document.getElementById('userNameIcon');
+  const registerBtn = document.querySelector('a[href="register.html"]');
+
+  if (isLogged) {
+    const userName = session.user.name;
+    if (loginBtn) {
+      loginBtn.textContent = 'Hola, ' + userName;
+      loginBtn.href = '#'; // O a una página de perfil
+    }
+    if (registerBtn) {
+        registerBtn.style.display = 'none'; // Ocultar "Regístrate"
+    }
+    if (userNameNav) {
+      userNameNav.textContent = userName;
+    }
+    if (userNameIcon) {
+      userNameIcon.textContent = userName;
+    }
+    if (logoutBtn) {
+      logoutBtn.style.display = 'inline-block';
+      logoutBtn.onclick = (e) => {
+        e.preventDefault();
+        logout('index.html'); // Redirigir a home al cerrar sesión
+      };
+    }
+    if (wishlistBtn) wishlistBtn.style.display = 'none';
+  } else {
+    // Estado no logueado
+    if (loginBtn) {
+      loginBtn.textContent = 'Inicia Sesión';
+      loginBtn.href = 'login.html';
+    }
+    if (registerBtn) registerBtn.style.display = 'inline-block';
+    if (userNameNav) userNameNav.textContent = 'About This'; // Valor por defecto
+    if (userNameIcon) userNameIcon.textContent = '';
+    if (logoutBtn) logoutBtn.style.display = 'none';
+    if (wishlistBtn) wishlistBtn.style.display = 'inline-block';
+  }
+}
+
+// Exponer helpers y auto-inicializar
+window.Auth = { requireAuth, logout, getSession, updateAuthUI };
+
+document.addEventListener("DOMContentLoaded", () => {
+  attachLoginHandler();
+  updateAuthUI();
+});

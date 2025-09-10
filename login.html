@@ -44,68 +44,7 @@
     </div>
   </div>
 
-  <!-- ✅ API en Render (no localhost) -->
-  <script>
-    const API_BASE = "https://perfumeriaclemenss.onrender.com";
-  </script>
-
-  <!-- ✅ ÚNICO script con la lógica de login -->
-  <script>
-    (function () {
-      const form = document.getElementById('loginForm');
-      const errorBox = document.getElementById('loginError');
-
-      function showError(msg) {
-        errorBox.textContent = msg || 'Credenciales inválidas.';
-        errorBox.classList.remove('d-none');
-      }
-      function hideError() {
-        errorBox.classList.add('d-none');
-        errorBox.textContent = '';
-      }
-
-      form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        hideError();
-
-        // Validación simple
-        let valid = true;
-        ['email','password'].forEach(id => {
-          const el = document.getElementById(id);
-          if (!el.checkValidity()) { el.classList.add('is-invalid'); valid = false; }
-          else { el.classList.remove('is-invalid'); }
-        });
-        if (!valid) return;
-
-        const email = document.getElementById('email').value.trim();
-        const password = document.getElementById('password').value;
-
-        try {
-          const resp = await fetch(`${API_BASE}/api/login`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password })
-            // SIN credentials: 'include'
-          });
-          const data = await resp.json().catch(() => ({}));
-
-          if (!resp.ok) {
-            showError(data.error || `Error (HTTP ${resp.status})`);
-            return;
-          }
-
-          // Guarda usuario en localStorage para la sesión
-          localStorage.setItem('app.jwt', JSON.stringify({ user: data.user }));
-
-          // Redirige
-          const to = form.dataset.redirect || 'index.html';
-          window.location.href = to;
-        } catch (err) {
-          console.error(err);
-          showError('Error de red o CORS. Revisa la consola.');
-        }
-      });
-    })();
-  </script>
+  <!-- Script centralizado de autenticación -->
+  <script src="js/auth.js"></script>
 </body>
 </html>

@@ -1,40 +1,3 @@
-// Mostrar el contenido del carrito en la página carrito.html
-function mostrarCarrito() {
-    const carrito = JSON.parse(localStorage.getItem("carrito")) || [];
-    const contenedor = document.getElementById("carrito-lista");
-    if (!contenedor) return;
-    if (carrito.length === 0) {
-        contenedor.innerHTML = '<p class="text-center">El carrito está vacío.</p>';
-        return;
-    }
-    let total = 0;
-    contenedor.innerHTML = carrito.map(producto => {
-        total += producto.precio * producto.cantidad;
-        return `
-        <div class="card mb-3">
-            <div class="row g-0 align-items-center">
-                <div class="col-md-2 text-center">
-                    <img src="${producto.imagen}" alt="${producto.nombre}" class="img-fluid" style="max-width:80px;">
-                </div>
-                <div class="col-md-6">
-                    <h5 class="card-title mb-1">${producto.nombre}</h5>
-                    <p class="mb-0">Precio: $${producto.precio.toLocaleString()}</p>
-                </div>
-                <div class="col-md-2">
-                    <span class="badge bg-secondary">Cantidad: ${producto.cantidad}</span>
-                </div>
-                <div class="col-md-2 text-end">
-                    <span class="fw-bold">Subtotal: $${(producto.precio * producto.cantidad).toLocaleString()}</span>
-                </div>
-            </div>
-        </div>
-        `;
-    }).join("");
-    contenedor.innerHTML += `<div class='text-end fw-bold fs-5 mt-3'>Total: $${total.toLocaleString()}</div>`;
-}
-
-// Ejecutar mostrarCarrito al cargar la página carrito.html
-document.addEventListener('DOMContentLoaded', mostrarCarrito);
 // carrito.js
 // Funciones para gestionar el carrito en localStorage
 
@@ -58,6 +21,20 @@ function mostrarMensaje(texto) {
     if (!mensaje) {
         mensaje = document.createElement("div");
         mensaje.id = "mensaje";
+        Object.assign(mensaje.style, {
+            display: 'none',
+            position: 'fixed',
+            top: '30px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            background: '#324f5c',
+            color: '#fff',
+            padding: '12px 32px',
+            borderRadius: '8px',
+            zIndex: '9999',
+            fontSize: '1.2rem',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.15)'
+        });
         document.body.appendChild(mensaje);
     }
     mensaje.textContent = texto;
@@ -70,63 +47,82 @@ function mostrarMensaje(texto) {
 // Actualiza el carrito automáticamente si se agrega un producto desde otra pestaña o ventana
 window.addEventListener('storage', function(e) {
   if (e.key === 'carrito') {
-    mostrarCarrito();
-    mostrarMensaje('Producto agregado al carrito');
+    if (typeof mostrarCarrito === 'function' && window.location.pathname.includes('carrito.html')) {
+        mostrarCarrito();
+    }
+    mostrarMensaje('El carrito ha sido actualizado.');
   }
 });
 
 function mostrarCarrito() {
     const carrito = JSON.parse(localStorage.getItem("carrito")) || [];
     const contenedor = document.getElementById("carrito-lista");
+    const subtotalEl = document.getElementById("subtotal");
+    const ivaEl = document.getElementById("iva");
+    const totalEl = document.getElementById("total");
+
     if (!contenedor) return;
+
     if (carrito.length === 0) {
-        contenedor.innerHTML = '<p class="text-center">El carrito está vacío.</p>';
+        contenedor.innerHTML = '<div class="text-center p-4">El carrito está vacío.</div>';
+        if(subtotalEl) subtotalEl.textContent = "$0";
+        if(ivaEl) ivaEl.textContent = "$0";
+        if(totalEl) totalEl.textContent = "$0";
         return;
     }
-    let total = 0;
-    contenedor.innerHTML = carrito.map(producto => {
-        total += producto.precio * producto.cantidad;
+
+    let subtotal = 0;
+    contenedor.innerHTML = carrito.map((producto, index) => {
+        const itemTotal = producto.precio * producto.cantidad;
+        subtotal += itemTotal;
         return `
-        <div class="card mb-3">
-            <div class="row g-0 align-items-center">
-                <div class="col-md-2 text-center">
-                    <img src="${producto.imagen}" alt="${producto.nombre}" class="img-fluid" style="max-width:80px;">
-                </div>
-                <div class="col-md-6">
-                    <h5 class="card-title mb-1">${producto.nombre}</h5>
-                    <p class="mb-0">Precio: $${producto.precio.toLocaleString()}</p>
-                </div>
-                <div class="col-md-2">
-                    <span class="badge bg-secondary">Cantidad: ${producto.cantidad}</span>
-                </div>
-                <div class="col-md-2 text-end">
-                    <span class="fw-bold">Subtotal: $${(producto.precio * producto.cantidad).toLocaleString()}</span>
-                </div>
+        <div class="carrito__item">
+            <img src="${producto.imagen}" alt="${producto.nombre}" class="carrito__item-imagen">
+            <div class="carrito__item-info">
+                <span>${producto.nombre}</span>
+                <span>$${producto.precio.toLocaleString()}</span>
+                <span>Total: $${itemTotal.toLocaleString()}</span>
             </div>
+            <div class="carrito__item-cantidad">
+                <button onclick="cambiarCantidad(${index}, ${producto.cantidad - 1})">-</button>
+                <span>${producto.cantidad}</span>
+                <button onclick="cambiarCantidad(${index}, ${producto.cantidad + 1})">+</button>
+            </div>
+            <button class="carrito__item-eliminar" onclick="eliminarProducto(${index})">Eliminar</button>
         </div>
-        `; 
+        `;
     }).join("");
-    contenedor.innerHTML += `<div class='text-end fw-bold fs-5 mt-3'>Total: $${total.toLocaleString()}</div>`;
+
+    const iva = subtotal * 0.19;
+    const total = subtotal + iva;
+
+    if(subtotalEl) subtotalEl.textContent = `$${subtotal.toLocaleString()}`;
+    if(ivaEl) ivaEl.textContent = `$${iva.toLocaleString()}`;
+    if(totalEl) totalEl.textContent = `$${total.toLocaleString()}`;
+}
+
 function cambiarCantidad(index, cantidad) {
+    let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
     if (cantidad < 1) {
         eliminarProducto(index);
     } else {
         carrito[index].cantidad = cantidad;
-    }
-    localStorage.setItem("carrito", JSON.stringify(carrito));
-    mostrarCarrito();
-}
-function eliminarProducto(index) {
-    let conformacion = confirm("¿Estás seguro de que deseas eliminar este producto del carrito?");
-    if (conformacion) {
-        carrito.splice(index, 1);
-        let mensajeEliminar = document.getElementById("mensaje");
-        mensajeEliminar.textContent = "Producto eliminado del carrito.";
-        mensajeEliminar.style.display = "block";
         localStorage.setItem("carrito", JSON.stringify(carrito));
         mostrarCarrito();
-        setTimeout(() => {
-            mensajeEliminar.style.display = "none";
-        }, 3000);
     }
+}
+
+function eliminarProducto(index) {
+    let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+    if (confirm("¿Estás seguro de que deseas eliminar este producto del carrito?")) {
+        carrito.splice(index, 1);
+        localStorage.setItem("carrito", JSON.stringify(carrito));
+        mostrarCarrito();
+        mostrarMensaje("Producto eliminado del carrito.");
+    }
+}
+
+// Ejecutar mostrarCarrito al cargar la página del carrito
+if (window.location.pathname.includes('carrito.html')) {
+    document.addEventListener('DOMContentLoaded', mostrarCarrito);
 }

@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const nameInput = document.getElementById("name");
   const emailInput = document.getElementById("email");
   const passInput = document.getElementById("password");
-  const errorBox = document.getElementById("registerError");
+  const errorBox = document.getElementById("registerMsg");
   const submitBtn = form.querySelector('button[type="submit"]');
 
   // Mejora accesibilidad del contenedor de errores
@@ -84,7 +84,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // Éxito
       // Mejor evitar alert(); usamos un mensaje verde temporal o redirigimos directo
-      window.location.href = "login.html?registered=1";
+      showError("¡Cuenta creada! Redirigiendo a inicio de sesión...", true);
+      setTimeout(() => { window.location.href = "login.html?registered=1"; }, 1500);
     } catch (err) {
       if (err.name === "AbortError") return; // se canceló por nuevo submit
       showError(err.message || "Error al registrar.");
@@ -106,8 +107,10 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  function showError(msg) {
+  function showError(msg, isSuccess = false) {
     errorBox.textContent = msg;
+    errorBox.className = isSuccess ? 'alert alert-success' : 'alert alert-danger';
+    errorBox.setAttribute('role', 'alert');
     errorBox.style.display = "block";
   }
 

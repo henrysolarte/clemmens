@@ -280,50 +280,6 @@
             <!--<p class="fs-4">Dignissim massa diam elementum.</p>-->
             <div class="d-flex gap-3">
                   <a id="loginBtn" href="login.html" class="btn btn-primary text-uppercase fs-6 rounded-pill px-4 py-3 mt-3">Inicia Sesión</a>
-<script>
-  // Chequeo inmediato por si el usuario ya está autenticado
-  (function() {
-    try {
-      var raw = localStorage.getItem('app.jwt');
-      var isLogged = false;
-      if (raw) {
-        var s = JSON.parse(raw);
-        if (s && s.user && s.user.name) {
-          isLogged = true;
-          var btn = document.getElementById('loginBtn');
-          if (btn) {
-            btn.textContent = 'Hola, ' + s.user.name;
-            btn.href = '#';
-          }
-          var userNameNav = document.getElementById('userNameNav');
-          if (userNameNav) {
-            userNameNav.textContent = s.user.name;
-          }
-          var userNameIcon = document.getElementById('userNameIcon');
-          if (userNameIcon) {
-            userNameIcon.textContent = s.user.name;
-          }
-        }
-      }
-      var logoutBtn = document.getElementById('logoutBtn');
-      var wishlistBtn = document.getElementById('wishlistBtn');
-      if (isLogged) {
-        if (logoutBtn) logoutBtn.style.display = 'inline-block';
-        if (wishlistBtn) wishlistBtn.style.display = 'none';
-        if (logoutBtn) {
-          logoutBtn.onclick = function(e) {
-            e.preventDefault();
-            localStorage.removeItem('app.jwt');
-            window.location.reload();
-          };
-        }
-      } else {
-        if (logoutBtn) logoutBtn.style.display = 'none';
-        if (wishlistBtn) wishlistBtn.style.display = 'inline-block';
-      }
-    } catch(e) {}
-  })();
-</script>
                 <a href="register.html" class="btn btn-dark text-uppercase fs-6 rounded-pill px-4 py-3 mt-3">Registrate</a>
             </div>
             <div class="row my-5">
@@ -1516,6 +1472,7 @@
   <script src="js/plugins.js"></script>
   <script src="js/script.js"></script>
   <script src="js/carrito.js"></script>
+  <script src="js/auth.js" defer></script>
   <script src="js/productos.js"></script>
     <script>
 
@@ -1619,28 +1576,6 @@ document.querySelectorAll('a[href="#para-el"]').forEach(function(link) {
 
 <!-- en tu index.html, antes de </body> -->
 
-
-<script>
-  window.addEventListener('DOMContentLoaded', () => {
-    function updateLoginBtn() {
-      if (!window.Auth) return setTimeout(updateLoginBtn, 50);
-      const session = window.Auth.getSession();
-      const loginBtn = document.getElementById('loginBtn');
-      if (session && session.user && loginBtn) {
-        loginBtn.textContent = `Hola, ${session.user.name}`;
-        loginBtn.href = '#';
-      } else if (loginBtn) {
-        loginBtn.textContent = 'Iniciar sesión';
-        loginBtn.href = 'login.html';
-      }
-    }
-    updateLoginBtn();
-    // También actualizar el botón si cambia el almacenamiento (por ejemplo, tras login)
-    window.addEventListener('storage', function(e) {
-      if (e.key === 'app.jwt') updateLoginBtn();
-    });
-  });
-</script>
 
 <div id="mensaje" style="display:none;position:fixed;top:30px;left:50%;transform:translateX(-50%);background:#324f5c;color:#fff;padding:12px 32px;border-radius:8px;z-index:9999;font-size:1.2rem;box-shadow:0 2px 8px rgba(0,0,0,0.15);"></div>
 
