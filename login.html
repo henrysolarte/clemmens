@@ -94,8 +94,8 @@
             return;
           }
 
-          // Guarda usuario en session/localStorage si quieres
-          // localStorage.setItem('user', JSON.stringify(data.user));
+          // Guarda usuario en localStorage para la sesión
+          localStorage.setItem('app.jwt', JSON.stringify({ user: data.user }));
 
           // Redirige
           const to = form.dataset.redirect || 'index.html';
