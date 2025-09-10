@@ -11,18 +11,32 @@ const bcrypt = require('bcryptjs');  // <- Este funciona en Render (100% JS)
 const app = express();
 
 /* ===== CORS: permite tu front de Render (y localhost para pruebas) ===== */
-app.use(
-  cors({
-    origin: [
-      'https://clemmens.onrender.com',
-      'http://localhost:3000',
-      'http://127.0.0.1:3000',
-    ],
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  })
-);
+/* ===== CORS: clemmens (Render) y localhost; preflight explícito ===== */
+const ALLOWED_ORIGINS = new Set([
+  'https://clemmens.onrender.com',
+  'http://localhost:3000',
+  'http://127.0.0.1:3000',
+]);
 
-app.use(express.json());
+const corsOptions = {
+  origin(origin, cb) {
+    // Permite peticiones sin Origin (curl/health) y las de la lista
+    if (!origin || ALLOWED_ORIGINS.has(origin)) return cb(null, true);
+    return cb(null, false);
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: false,              // no usamos cookies
+  optionsSuccessStatus: 200,       // evita 204 problemáticos en algunos navegadores
+};
+
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));            // responde preflight en cualquier ruta
+app.use((req, res, next) => {                   // fallback: si llegara algún OPTIONS, 200
+  if (req.method === 'OPTIONS') return res.sendStatus(200);
+  next();
+});
+
 
 /* ===== Postgres (Render inyecta DATABASE_URL) ===== */
 const pool = new Pool({
