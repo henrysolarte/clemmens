@@ -82,7 +82,11 @@ app.get('/api/db-ping', async (_req, res) => {
 /* ===== Auth sencilla: register / login ===== */
 app.post('/api/register', async (req, res) => {
   try {
-    const { name, email, password } = req.body || {};
+    let { name, email, password } = req.body || {};
+    // Normaliza y valida los campos
+    name = typeof name === 'string' ? name.trim() : '';
+    email = typeof email === 'string' ? email.trim() : '';
+    password = typeof password === 'string' ? password : '';
     if (!name || !email || !password) {
       return res.status(400).json({ error: 'Faltan campos' });
     }
