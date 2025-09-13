@@ -2,9 +2,10 @@ document.addEventListener("DOMContentLoaded", function() {
     // Mostrar producto seleccionado desde el carrito
     const productoInfo = document.getElementById("producto-info");
     const carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+    let productosHTML = '';
+    let total = 0;
     if (carrito.length > 0) {
-        let productosHTML = '<div style="display:flex; flex-direction:column; align-items:center;">';
-        let total = 0;
+        productosHTML += '<div style="display:flex; flex-direction:column; align-items:center;">';
         carrito.forEach(producto => {
             const itemTotal = (producto.precio || 0) * (producto.cantidad || 1);
             total += itemTotal;
@@ -13,20 +14,19 @@ document.addEventListener("DOMContentLoaded", function() {
                     <img src="${producto.imagen || 'images/perfume_232x210.png'}" alt="${producto.nombre}" style="width:100px; height:auto; margin-bottom:10px;">
                     <p style="margin:0;"><strong>${producto.nombre}</strong></p>
                     <p style="margin:0;">Cantidad: ${producto.cantidad || 1}</p>
-                    <p style="margin:0;">Precio unitario: $${producto.precio || '---'}</p>
+                    <p style="margin:0;">Precio unitario: $${producto.precio ? producto.precio.toLocaleString() : '---'}</p>
                     <p style="margin:0;">Subtotal: $${itemTotal.toLocaleString()}</p>
                 </div>
             `;
         });
         productosHTML += `<div style="margin-top:20px; font-size:1.2em; color:#fff; font-weight:bold;">TOTAL A PAGAR: $${total.toLocaleString()}</div>`;
         productosHTML += '</div>';
-        productoInfo.innerHTML = productosHTML;
-        // Guardar el total en una variable global para usar en el pago
         window.totalPago = total;
     } else {
-        productoInfo.innerHTML = "<p>No hay productos seleccionados.</p>";
+        productosHTML = "<p>No hay productos seleccionados.</p>";
         window.totalPago = 0;
     }
+    productoInfo.innerHTML = productosHTML;
 
     // darle formato a la tarjeta
     const numeroTarjeta = document.getElementById("numero");
