@@ -186,42 +186,44 @@
         </header>
 
     <section class="pagos">
-        <div class="pagos__producto" id="pagos__producto">
-            <h2>Producto Seleccionado</h2>
-            <div id="producto-info">
-                <!-- Aquí se mostrará el producto seleccionado desde el carrito -->
+        <div class="carrito_total" style="max-width:600px; margin:40px auto;">
+            <div class="pagos__producto" id="pagos__producto" style="text-align:center;">
+                <h2 style="color:white;">Producto Seleccionado</h2>
+                <div id="producto-info">
+                    <!-- Aquí se mostrará el producto seleccionado desde el carrito -->
+                </div>
             </div>
-        </div>
-        <div class="pagos__formulario" id="pagos__formulario">
-            <h2>INFORMACIÓN DE PAGOS</h2>
-            <form>
-                <div>
-                    <label>Nombre en la tarjeta:</label>
-                    <input class="pagos__input" type="text" id="nombre" name="nombre" required>
-                </div>
-                <div>
-                    <label>Número en la tarjeta:</label>
-                    <input class="pagos__input" type="text" id="numero" name="numero" maxlength="19" required>
-                </div>
-                <div>
-                    <label>Fecha de expiración:</label>
-                    <input class="pagos__input" type="text" id="fecha-expiracion" maxlength="5" name="fecha-expiracion" required>
-                </div>
-                <div>
-                    <label>Código de seguridad (CVV):</label>
-                    <input class="pagos__input" type="text" id="codigo-seguridad" maxlength="3" name="codigo-seguridad" required>
-                </div>
-                <div class="pagos__botones">
-                    <button type="submit" id="pagos__boton">Pagar</button>
-                    <button type="button" onclick="window.location.href='carrito.html'">Volver al carrito</button>
-                </div>
-            </form>
-        </div>
-        <div class="pagos__confirmacion" id="pagos__confirmacion" style="display:none;">
-            <h2>¡Gracias por tu compra!</h2>
-            <p>Tu pago ha sido realizado con éxito.</p>
-            <p id="pago__orden"></p>
-            <button class="pagos__botones-inicio" type="button" onclick="window.location.href='index.html'">Volver al inicio</button>
+            <div class="pagos__formulario" id="pagos__formulario" style="text-align:center;">
+                <h2 style="color:white;">INFORMACIÓN DE PAGOS</h2>
+                <form>
+                    <div style="margin-bottom:10px;">
+                        <label style="color:white;">Nombre en la tarjeta:</label>
+                        <input class="pagos__input" type="text" id="nombre" name="nombre" required>
+                    </div>
+                    <div style="margin-bottom:10px;">
+                        <label style="color:white;">Número en la tarjeta:</label>
+                        <input class="pagos__input" type="text" id="numero" name="numero" maxlength="19" required>
+                    </div>
+                    <div style="margin-bottom:10px;">
+                        <label style="color:white;">Fecha de expiración:</label>
+                        <input class="pagos__input" type="text" id="fecha-expiracion" maxlength="5" name="fecha-expiracion" required>
+                    </div>
+                    <div style="margin-bottom:10px;">
+                        <label style="color:white;">Código de seguridad (CVV):</label>
+                        <input class="pagos__input" type="text" id="codigo-seguridad" maxlength="3" name="codigo-seguridad" required>
+                    </div>
+                    <div class="pagos__botones" style="margin-top:20px;">
+                        <button type="submit" id="pagos__boton" class="carrito__pagar">Pagar</button>
+                        <button type="button" class="carrito__seguir-comprando" onclick="window.location.href='carrito.html'">Volver al carrito</button>
+                    </div>
+                </form>
+            </div>
+            <div class="pagos__confirmacion" id="pagos__confirmacion" style="display:none; text-align:center;">
+                <h2 style="color:white;">¡Gracias por tu compra!</h2>
+                <p style="color:white;">Tu pago ha sido realizado con éxito.</p>
+                <p id="pago__orden" style="color:white;"></p>
+                <button class="carrito__seguir-comprando" type="button" onclick="window.location.href='index.html'">Volver al inicio</button>
+            </div>
         </div>
     </section>
 
