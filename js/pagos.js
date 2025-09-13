@@ -3,18 +3,29 @@ document.addEventListener("DOMContentLoaded", function() {
     const productoInfo = document.getElementById("producto-info");
     const carrito = JSON.parse(localStorage.getItem("carrito")) || [];
     if (carrito.length > 0) {
-        // Muestra solo el primer producto (puedes adaptar para varios)
-        const producto = carrito[0];
-        productoInfo.innerHTML = `
-            <div class="producto-resumen">
-                <img src="${producto.imagen || 'images/perfume_232x210.png'}" alt="${producto.nombre}" style="width:100px; height:auto;">
-                <p><strong>${producto.nombre}</strong></p>
-                <p>Cantidad: ${producto.cantidad || 1}</p>
-                <p>Precio: $${producto.precio || '---'}</p>
-            </div>
-        `;
+        let productosHTML = '<div style="display:flex; flex-direction:column; align-items:center;">';
+        let total = 0;
+        carrito.forEach(producto => {
+            const itemTotal = (producto.precio || 0) * (producto.cantidad || 1);
+            total += itemTotal;
+            productosHTML += `
+                <div class="producto-resumen" style="margin-bottom:20px; background:rgba(255,255,255,0.08); border-radius:12px; padding:16px; width:90%; max-width:400px; color:white;">
+                    <img src="${producto.imagen || 'images/perfume_232x210.png'}" alt="${producto.nombre}" style="width:100px; height:auto; margin-bottom:10px;">
+                    <p style="margin:0;"><strong>${producto.nombre}</strong></p>
+                    <p style="margin:0;">Cantidad: ${producto.cantidad || 1}</p>
+                    <p style="margin:0;">Precio unitario: $${producto.precio || '---'}</p>
+                    <p style="margin:0;">Subtotal: $${itemTotal.toLocaleString()}</p>
+                </div>
+            `;
+        });
+        productosHTML += `<div style="margin-top:20px; font-size:1.2em; color:#fff; font-weight:bold;">TOTAL A PAGAR: $${total.toLocaleString()}</div>`;
+        productosHTML += '</div>';
+        productoInfo.innerHTML = productosHTML;
+        // Guardar el total en una variable global para usar en el pago
+        window.totalPago = total;
     } else {
         productoInfo.innerHTML = "<p>No hay productos seleccionados.</p>";
+        window.totalPago = 0;
     }
 
     // darle formato a la tarjeta
@@ -107,7 +118,7 @@ document.addEventListener("DOMContentLoaded", function() {
         setTimeout(() => {
             formulario.style.display = "none";
             confirmacion.style.display = "block";
-            ordenNumero.textContent = "Número de orden: " + orden;
+            ordenNumero.textContent = "Número de orden: " + orden + "\nTotal pagado: $" + (window.totalPago ? window.totalPago.toLocaleString() : "0");
         }, 3000);
     })
 });
