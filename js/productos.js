@@ -13,6 +13,7 @@ window.productos = [
     reviews: 222,
     descripcion: "Una fragancia femenina, dulce y sofisticada, con notas de iris, jazmín y flor de azahar. Ideal para mujeres que buscan elegancia y alegría en cada aroma."
   },
+ 
   {
     nombre: "Flowerbomb",
     precio: 230000,
@@ -111,6 +112,17 @@ window.productos = [
     rating: 4.5,
     reviews: 222,
     descripcion: "Aroma fresco y floral, con notas de almizcle y flores blancas. Ideal para quienes buscan delicadeza y modernidad."
+  },
+   {
+    nombre: "360 para mujer",
+    precio: 210000,
+    imagen: "images/product-thumb-24.png",
+    categoria: "Para ella",
+    descuento: "12% OFF",
+    precioOriginal: 240000,
+    rating: 4.3,
+    reviews: 98,
+    descripcion: "Perfume fresco y vibrante con notas florales y frutales. Ideal para mujeres modernas que buscan un aroma ligero y duradero."
   },
   {
     nombre: "Le Male Elixir",
