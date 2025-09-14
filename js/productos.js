@@ -256,7 +256,7 @@ function renderProductos() {
           </div>
           <div class="button-area p-3 pt-0">
             <div class="row g-1 mt-2">
-              <div class="col-3"><input type="number" name="quantity" class="form-control border-dark-subtle input-number quantity" value="1" id="qty-prod-${idx}"></div>
+              <div class="col-2"><a href="#" class="btn btn-outline-dark rounded-1 p-2 fs-6"><svg width="18" height="18"><use xlink:href='#heart'></use></svg></a></div>
               <div class="col-7">
                 <button type="button" class="btn btn-primary rounded-1 p-2 fs-7 btn-cart" id="btn-cart-${idx}" data-idx="${idx}">
                   <svg width="18" height="18"><use xlink:href='#cart'></use></svg> Add to Cart
