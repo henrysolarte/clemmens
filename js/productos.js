@@ -125,7 +125,7 @@ window.productos = [
   },
   {
     nombre: "bleu de chanel",
-    precio: 450000,
+    precio: 1000000,
     imagen: "images/product-thumb-11.png",
     categoria: "Para él",
     descuento: "15% OFF",
