@@ -48,11 +48,34 @@ function renderizarProductosPorCategoria(categoria, contenedorId) {
   }).join('');
 }
 
+function renderizarMasVendidos(contenedorId, cantidad) {
+  const contenedor = document.getElementById(contenedorId);
+  if (!contenedor) return;
+
+  // Ordenar productos por 'reviews' de forma descendente y tomar la cantidad especificada
+  const masVendidos = window.productos
+    .slice() // Crear una copia para no modificar el array original
+    .sort((a, b) => b.reviews - a.reviews)
+    .slice(0, cantidad);
+
+  contenedor.innerHTML = masVendidos.map(producto => {
+    // Escapar comillas en el nombre del producto para el onclick
+    const nombreEscapado = producto.nombre.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+    return `
+      <a href="#" class="nav-link swiper-slide text-center" onclick="event.preventDefault();showProductModal('${nombreEscapado}')">
+        <img src="${producto.imagen}" class="rounded-circle" alt="${producto.nombre}">
+        <h4 class="fs-6 mt-3 fw-normal category-title">${producto.nombre}</h4>
+      </a>
+    `;
+  }).join('');
+}
+
 document.addEventListener('DOMContentLoaded', function() {
   if (!window.productos) return;
 
   renderizarProductosPorCategoria('Para ella', 'product-grid-ella');
   renderizarProductosPorCategoria('Para él', 'product-grid-el');
+  renderizarMasVendidos('mas-vendidos-wrapper', 12); // Cargar los 12 más vendidos
 
   // Delegación de eventos para botones "Add to Cart"
   document.body.addEventListener('click', function(e) {
