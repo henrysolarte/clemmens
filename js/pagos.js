@@ -118,9 +118,7 @@ document.addEventListener("DOMContentLoaded", function() {
         setTimeout(() => {
             formulario.style.display = "none";
             confirmacion.style.display = "block";
-            ordenNumero.textContent = "Número de orden: " + orden + " Total pagado: $" + (window.totalPago ? window.totalPago.toLocaleString() : "0");
-            // Vaciar el carrito después del pago
-            localStorage.removeItem("carrito");
+            ordenNumero.textContent = "Número de orden: " + orden + "\nTotal pagado: $" + (window.totalPago ? window.totalPago.toLocaleString() : "0");
         }, 3000);
     })
 });
