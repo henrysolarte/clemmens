@@ -116,6 +116,8 @@ document.addEventListener("DOMContentLoaded", function() {
         const carrito = JSON.parse(localStorage.getItem("carrito")) || [];
         const orden = guardarOrden(carrito);
         setTimeout(() => {
+            // Vacía el carrito después de pagar
+            localStorage.removeItem("carrito");
             formulario.style.display = "none";
             confirmacion.style.display = "block";
             ordenNumero.textContent = "Número de orden: " + orden + "\nTotal pagado: $" + (window.totalPago ? window.totalPago.toLocaleString() : "0");
