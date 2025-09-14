@@ -92,4 +92,71 @@ document.addEventListener('DOMContentLoaded', function() {
       `)
       .join('');
   }
+
+  // Los más vendidos (primeros 8 productos del array)
+  const masVendidos = window.productos.slice(0, 8);
+  const masVendidosLista = document.getElementById('mas-vendidos-lista');
+  if (masVendidosLista) {
+    masVendidos.forEach(producto => {
+      const div = document.createElement('div');
+      div.className = 'text-center';
+      div.innerHTML = `
+        <img src="${producto.imagen}" alt="${producto.nombre}" style="width:140px; height:140px; object-fit:cover; border-radius:50%;">
+        <div class="mt-2">${producto.nombre}</div>
+      `;
+      masVendidosLista.appendChild(div);
+    });
+  }
+
+  // Para ella
+  const paraElla = window.productos.filter(p => p.categoria === 'Para ella');
+  const paraEllaLista = document.getElementById('para-ella-lista');
+  if (paraEllaLista) {
+    paraElla.forEach(producto => {
+      const col = document.createElement('div');
+      col.className = 'col';
+      col.innerHTML = `
+        <div class="product-item card h-100 p-3 text-center">
+          <img src="${producto.imagen}" alt="${producto.nombre}" class="img-fluid mb-2" style="height:180px; object-fit:cover;">
+          <div>${producto.nombre}</div>
+          <div class="mt-2">
+            <span class="text-warning">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+            <span class="text-muted">(${producto.reviews})</span>
+          </div>
+          <div class="mt-2">
+            <span class="text-decoration-line-through text-muted">$${producto.precioOriginal.toLocaleString()}</span>
+            <span class="fw-bold ms-2">$${producto.precio.toLocaleString()}</span>
+            <span class="badge bg-light text-dark ms-2">${producto.descuento}</span>
+          </div>
+        </div>
+      `;
+      paraEllaLista.appendChild(col);
+    });
+  }
+
+  // Para él
+  const paraEl = window.productos.filter(p => p.categoria === 'Para él');
+  const paraElLista = document.getElementById('para-el-lista');
+  if (paraElLista) {
+    paraEl.forEach(producto => {
+      const col = document.createElement('div');
+      col.className = 'col';
+      col.innerHTML = `
+        <div class="product-item card h-100 p-3 text-center">
+          <img src="${producto.imagen}" alt="${producto.nombre}" class="img-fluid mb-2" style="height:180px; object-fit:cover;">
+          <div>${producto.nombre}</div>
+          <div class="mt-2">
+            <span class="text-warning">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+            <span class="text-muted">(${producto.reviews})</span>
+          </div>
+          <div class="mt-2">
+            <span class="text-decoration-line-through text-muted">$${producto.precioOriginal.toLocaleString()}</span>
+            <span class="fw-bold ms-2">$${producto.precio.toLocaleString()}</span>
+            <span class="badge bg-light text-dark ms-2">${producto.descuento}</span>
+          </div>
+        </div>
+      `;
+      paraElLista.appendChild(col);
+    });
+  }
 });

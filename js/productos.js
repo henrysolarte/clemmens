@@ -4,7 +4,7 @@
 window.productos = [
   {
     nombre: "La Vie Est Belle",
-    precio: 250000,
+    precio: 500000,
     imagen: "images/product-thumb-1.png",
     categoria: "Para ella",
     descuento: "10% OFF",
