@@ -6,6 +6,17 @@ document.addEventListener('DOMContentLoaded', function() {
     console.error('No se encontró la lista de productos');
     return;
   }
+  // --- STOCK LOCALSTORAGE ---
+  // Leer stock guardado
+  let stockLS = localStorage.getItem('productos_stock');
+  if (stockLS) {
+    try {
+      stockLS = JSON.parse(stockLS);
+      window.productos.forEach((p, i) => {
+        if (stockLS[i] !== undefined) p.stock = stockLS[i];
+      });
+    } catch {}
+  }
 
   // Selecciona los contenedores
   const contenedorElla = document.getElementById('productos-ella');
@@ -82,6 +93,8 @@ document.addEventListener('DOMContentLoaded', function() {
       }
       // Rebajar stock
       producto.stock -= cantidad;
+      // Guardar stock actualizado en localStorage
+      localStorage.setItem('productos_stock', JSON.stringify(window.productos.map(p => p.stock)));
       // Actualizar botón si stock llega a 0
       if (producto.stock <= 0) {
         btn.disabled = true;
