@@ -34,8 +34,8 @@ function renderizarProductosPorCategoria(categoria, contenedorId) {
                 <div class="row g-1 mt-2">
                   <div class="col-2"><a href="#" class="btn btn-outline-dark rounded-1 p-2 fs-6" data-index="${productoIndex}"><svg width="18" height="18"><use xlink:href='#heart'></use></svg></a></div>
                   <div class="col-7">
-                    <button type="button" class="btn btn-primary rounded-1 p-2 fs-7 btn-cart" data-index="${productoIndex}">
-                      <svg width="18" height="18"><use xlink:href='#cart'></use></svg> Add to Cart
+                    <button type="button" class="btn btn-primary rounded-1 p-2 fs-7 btn-cart" data-index="${productoIndex}" ${producto.stock <= 0 ? 'disabled' : ''}>
+                      <svg width="18" height="18"><use xlink:href='#cart'></use></svg> ${producto.stock <= 0 ? 'Sin stock' : 'Add to Cart'}
                     </button>
                   </div>
                   <div class="col-2"><a href="#" class="btn btn-outline-dark rounded-1 p-2 fs-6" data-index="${productoIndex}"><svg width="18" height="18"><use xlink:href='#heart'></use></svg></a></div>
@@ -86,6 +86,12 @@ document.addEventListener('DOMContentLoaded', function() {
       const producto = window.productos[productoIndex];
 
       if (producto) {
+        if (producto.stock <= 0) {
+          alert('Producto sin stock.');
+          button.disabled = true;
+          button.textContent = 'Sin stock';
+          return;
+        }
         if (!usuarioLogueado()) {
           alert('Debes iniciar sesión para agregar productos al carrito.');
           window.location.href = 'login.html';
@@ -96,12 +102,24 @@ document.addEventListener('DOMContentLoaded', function() {
         const cantidadInput = card.querySelector('input.quantity');
         const cantidad = cantidadInput ? parseInt(cantidadInput.value, 10) || 1 : 1;
 
+        if (producto.stock < cantidad) {
+          alert('No hay suficiente stock disponible.');
+          return;
+        }
+
         agregarAlCarrito({
           nombre: producto.nombre,
           precio: producto.precio,
           imagen: producto.imagen,
           cantidad: cantidad
         });
+        // Rebajar stock
+        producto.stock -= cantidad;
+        // Actualizar botón si stock llega a 0
+        if (producto.stock <= 0) {
+          button.disabled = true;
+          button.textContent = 'Sin stock';
+        }
       }
     }
   });

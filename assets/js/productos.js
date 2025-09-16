@@ -24,6 +24,10 @@ document.addEventListener('DOMContentLoaded', function() {
             <span class="text-muted text-decoration-line-through">$${producto.precioOriginal.toLocaleString()}</span>
             <span class="fw-bold text-primary">$${producto.precio.toLocaleString()}</span>
           </div>
+          <div class="mt-2">
+            <span class="badge bg-secondary">Stock: ${producto.stock}</span>
+          </div>
+          <button class="btn btn-primary mt-2 btn-cart" ${producto.stock <= 0 ? 'disabled' : ''}>${producto.stock <= 0 ? 'Sin stock' : 'Agregar al carrito'}</button>
         </div>
       </div>
     </div>`;
@@ -32,12 +36,59 @@ document.addEventListener('DOMContentLoaded', function() {
   // Filtra y muestra productos "Para ella"
   contenedorElla.innerHTML = window.productos
     .filter(p => p.categoria === 'Para ella')
-    .map(crearTarjeta)
+    .map((producto, idx) => {
+      return crearTarjeta(producto, idx);
+    })
     .join('');
 
   // Filtra y muestra productos "Para él"
   contenedorEl.innerHTML = window.productos
     .filter(p => p.categoria === 'Para él')
-    .map(crearTarjeta)
+    .map((producto, idx) => {
+      return crearTarjeta(producto, idx);
+    })
     .join('');
+
+  // Delegación de eventos para botones "Agregar al carrito"
+  document.querySelectorAll('.btn-cart').forEach((btn, idx) => {
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      const producto = window.productos[idx];
+      if (producto.stock <= 0) {
+        alert('Producto sin stock.');
+        btn.disabled = true;
+        btn.textContent = 'Sin stock';
+        return;
+      }
+      if (!window.usuarioLogueado || !window.usuarioLogueado()) {
+        alert('Debes iniciar sesión para agregar productos al carrito.');
+        window.location.href = 'login.html';
+        return;
+      }
+      // Por defecto 1 unidad
+      const cantidad = 1;
+      if (producto.stock < cantidad) {
+        alert('No hay suficiente stock disponible.');
+        return;
+      }
+      // Aquí deberías llamar a agregarAlCarrito si existe
+      if (typeof window.agregarAlCarrito === 'function') {
+        window.agregarAlCarrito({
+          nombre: producto.nombre,
+          precio: producto.precio,
+          imagen: producto.imagen,
+          cantidad: cantidad
+        });
+      }
+      // Rebajar stock
+      producto.stock -= cantidad;
+      // Actualizar botón si stock llega a 0
+      if (producto.stock <= 0) {
+        btn.disabled = true;
+        btn.textContent = 'Sin stock';
+      }
+      // Actualizar visualización de stock
+      btn.parentElement.querySelector('.badge.bg-secondary').textContent = 'Stock: ' + producto.stock;
+    });
+  });
 });
