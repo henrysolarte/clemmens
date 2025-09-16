@@ -103,8 +103,28 @@ function mostrarCarrito() {
 
 function cambiarCantidad(index, cantidad) {
     let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+    // Obtener stock real desde localStorage
+    let stockLS = localStorage.getItem('productos_stock');
+    let stock = 0;
+    if (stockLS) {
+        try {
+            stockLS = JSON.parse(stockLS);
+            // Buscar el producto en window.productos para obtener el índice global
+            if (window.productos) {
+                const idxGlobal = window.productos.findIndex(p => p.nombre === carrito[index].nombre);
+                if (idxGlobal !== -1) {
+                    stock = stockLS[idxGlobal];
+                }
+            }
+        } catch {}
+    }
     if (cantidad < 1) {
         eliminarProducto(index);
+    } else if (stock > 0 && cantidad > stock) {
+        mostrarMensaje('No hay suficiente stock disponible.');
+        carrito[index].cantidad = stock;
+        localStorage.setItem("carrito", JSON.stringify(carrito));
+        mostrarCarrito();
     } else {
         carrito[index].cantidad = cantidad;
         localStorage.setItem("carrito", JSON.stringify(carrito));

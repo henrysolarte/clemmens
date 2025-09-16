@@ -109,11 +109,31 @@ document.addEventListener("DOMContentLoaded", function() {
             alert("Por favor, complete todos los campos del formulario.");
             return;
         }
+        // Validar stock antes de pagar
+        const carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+        let stockLS = localStorage.getItem('productos_stock');
+        let stockArr = [];
+        if (stockLS) {
+            try {
+                stockArr = JSON.parse(stockLS);
+            } catch {}
+        }
+        let productosOk = true;
+        if (window.productos) {
+            for (let i = 0; i < carrito.length; i++) {
+                const idxGlobal = window.productos.findIndex(p => p.nombre === carrito[i].nombre);
+                if (idxGlobal !== -1 && carrito[i].cantidad > stockArr[idxGlobal]) {
+                    alert('No hay suficiente stock para ' + carrito[i].nombre + '. Solo quedan ' + stockArr[idxGlobal] + ' unidades.');
+                    productosOk = false;
+                    break;
+                }
+            }
+        }
+        if (!productosOk) return;
         const formulario = document.getElementById("pagos__formulario");
         const confirmacion = document.getElementById("pagos__confirmacion");
         botonpagos.disabled = true;
         botonpagos.textContent = "Procesando...";
-        const carrito = JSON.parse(localStorage.getItem("carrito")) || [];
         const orden = guardarOrden(carrito);
         setTimeout(() => {
             // Vacía el carrito después de pagar
