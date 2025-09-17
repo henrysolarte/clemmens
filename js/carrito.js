@@ -72,9 +72,26 @@ function mostrarCarrito() {
     }
 
     let subtotal = 0;
+    // Obtener stock real desde localStorage
+    let stockLS = localStorage.getItem('productos_stock');
+    let stockArr = [];
+    if (stockLS) {
+        try {
+            stockArr = JSON.parse(stockLS);
+        } catch {}
+    }
     contenedor.innerHTML = carrito.map((producto, index) => {
         const itemTotal = producto.precio * producto.cantidad;
         subtotal += itemTotal;
+        // Buscar el stock real para este producto
+        let stock = 0;
+        if (window.productos) {
+            const idxGlobal = window.productos.findIndex(p => p.nombre === producto.nombre);
+            if (idxGlobal !== -1) {
+                stock = stockArr[idxGlobal] ?? 0;
+            }
+        }
+        const btnPlusDisabled = (stock > 0 && producto.cantidad >= stock) ? 'disabled' : '';
         return `
         <div class="carrito__item">
             <img src="${producto.imagen}" alt="${producto.nombre}" class="carrito__item-imagen">
@@ -86,7 +103,7 @@ function mostrarCarrito() {
             <div class="carrito__item-cantidad">
                 <button onclick="cambiarCantidad(${index}, ${producto.cantidad - 1})">-</button>
                 <span>${producto.cantidad}</span>
-                <button onclick="cambiarCantidad(${index}, ${producto.cantidad + 1})">+</button>
+                <button onclick="cambiarCantidad(${index}, ${producto.cantidad + 1})" ${btnPlusDisabled}>+</button>
             </div>
             <button class="carrito__item-eliminar" onclick="eliminarProducto(${index})">Eliminar</button>
         </div>
