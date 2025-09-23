@@ -96,9 +96,9 @@ function mostrarCarrito() {
         <div class="carrito__item">
             <img src="${producto.imagen}" alt="${producto.nombre}" class="carrito__item-imagen">
             <div class="carrito__item-info">
-                <span>${producto.nombre}</span>
-                <span>$${producto.precio.toLocaleString()}</span>
-                <span>Total: $${itemTotal.toLocaleString()}</span>
+                <span class="carrito__item-nombre">${producto.nombre}</span>
+                <span class="carrito__item-precio">$${producto.precio.toLocaleString()}</span>
+                <span class="carrito__item-total">Total: $${itemTotal.toLocaleString()}</span>
             </div>
             <div class="carrito__item-cantidad">
                 <button onclick="cambiarCantidad(${index}, ${producto.cantidad - 1})">-</button>
