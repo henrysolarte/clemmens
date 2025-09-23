@@ -1,0 +1,40 @@
+/* Estilos para la página de pagos (pagos.html) */
+
+.producto-resumen {
+    text-align: center; /* Mantenemos el centrado que estaba en pagos.html */
+    margin-bottom: 20px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 16px;
+    width: 90%;
+    max-width: 400px;
+    color: #FFD700; /* Color por defecto para el texto del resumen (dorado) */
+}
+
+.producto-resumen img {
+    width: 100px;
+    height: auto;
+    margin-bottom: 10px;
+}
+
+.producto-resumen p {
+    margin: 0;
+    font-size: 1rem; /* Tamaño de fuente consistente */
+}
+
+.producto-resumen .producto-nombre {
+    font-weight: bold;
+    font-size: 1.1rem; /* Un poco más grande para el nombre */
+}
+
+.producto-resumen .producto-nombre,
+.producto-resumen .producto-precio {
+    color: #fff; /* <-- Color blanco para el nombre y el precio del producto */
+}
+
+.total-pagar {
+    margin-top: 20px;
+    font-size: 1.2em;
+    color: #fff; /* Color para el total (blanco por defecto) */
+    font-weight: bold;
+}

@@ -10,16 +10,16 @@ document.addEventListener("DOMContentLoaded", function() {
             const itemTotal = (producto.precio || 0) * (producto.cantidad || 1);
             total += itemTotal;
             productosHTML += `
-                <div class="producto-resumen" style="margin-bottom:20px; background:rgba(255,255,255,0.08); border-radius:12px; padding:16px; width:90%; max-width:400px; color:white;">
-                    <img src="${producto.imagen || 'images/perfume_232x210.png'}" alt="${producto.nombre}" style="width:100px; height:auto; margin-bottom:10px;">
-                    <p style="margin:0;"><strong>${producto.nombre}</strong></p>
-                    <p style="margin:0;">Cantidad: ${producto.cantidad || 1}</p>
-                    <p style="margin:0;">Precio unitario: $${producto.precio ? producto.precio.toLocaleString() : '---'}</p>
-                    <p style="margin:0;">Subtotal: $${itemTotal.toLocaleString()}</p>
+                <div class="producto-resumen">
+                    <img src="${producto.imagen || 'images/perfume_232x210.png'}" alt="${producto.nombre}">
+                    <p class="producto-nombre">${producto.nombre}</p>
+                    <p>Cantidad: ${producto.cantidad || 1}</p>
+                    <p class="producto-precio">Precio unitario: $${producto.precio ? producto.precio.toLocaleString() : '---'}</p>
+                    <p>Subtotal: $${itemTotal.toLocaleString()}</p>
                 </div>
             `;
         });
-        productosHTML += `<div style="margin-top:20px; font-size:1.2em; color:#fff; font-weight:bold;">TOTAL A PAGAR: $${total.toLocaleString()}</div>`;
+        productosHTML += `<div class="total-pagar">TOTAL A PAGAR: $${total.toLocaleString()}</div>`;
         productosHTML += '</div>';
         window.totalPago = total;
     } else {
