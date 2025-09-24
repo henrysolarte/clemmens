@@ -70,18 +70,11 @@ function renderizarMasVendidos(contenedorId, cantidad) {
   }).join('');
 }
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
   if (!window.productos) return;
 
-  // --- STOCK LOCALSTORAGE ---
-  let stockLS = localStorage.getItem('productos_stock');
-  if (stockLS) {
-    try {
-      stockLS = JSON.parse(stockLS);
-      window.productos.forEach((p, i) => {
-        if (stockLS[i] !== undefined) p.stock = stockLS[i];
-      });
-    } catch {}
+  if (typeof window.syncProductosConBackend === 'function') {
+    await window.syncProductosConBackend();
   }
 
   renderizarProductosPorCategoria('Para ella', 'product-grid-ella');
@@ -119,15 +112,14 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         agregarAlCarrito({
+          productoId: producto.productoId,
           nombre: producto.nombre,
           precio: producto.precio,
           imagen: producto.imagen,
           cantidad: cantidad
         });
-        // Rebajar stock
+        // Rebajar stock solo en memoria para la sesion actual.
         producto.stock -= cantidad;
-        // Guardar stock actualizado en localStorage
-        localStorage.setItem('productos_stock', JSON.stringify(window.productos.map(p => p.stock)));
         // Actualizar botón si stock llega a 0
         if (producto.stock <= 0) {
           button.disabled = true;

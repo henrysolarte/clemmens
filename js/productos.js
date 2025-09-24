@@ -1,6 +1,11 @@
 // productos.js
 // Lista de perfumes Clemenss para mostrar en productos.html
 
+const productosIsProd = location.hostname.endsWith("onrender.com");
+const PRODUCTOS_API_URL = productosIsProd
+  ? "https://perfumeriaclemenss.onrender.com/api"
+  : (window.__API_URL__ || "http://localhost:3002/api");
+
 window.productos = [
   {
     nombre: "La Vie Est Belle",
@@ -257,6 +262,72 @@ window.productos = [
   }
 ];
 
+function normalizarNombreProducto(nombre) {
+  return String(nombre || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "")
+    .trim();
+}
+
+function nombreCanonicoProducto(nombre) {
+  const normalizado = normalizarNombreProducto(nombre);
+  const alias = {
+    onemillon: 'onemillion',
+  };
+  return alias[normalizado] || normalizado;
+}
+
+async function syncProductosConBackend() {
+  try {
+    const res = await fetch(`${PRODUCTOS_API_URL}/perfumes`, { cache: "no-store" });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+    const data = await res.json();
+    const productosDb = Array.isArray(data?.productos) ? data.productos : [];
+    const fallbackByName = new Map(
+      window.productos.map((p) => [nombreCanonicoProducto(p.nombre), p])
+    );
+
+    const mapCategoriaDb = (categoriaDb) => {
+      const c = normalizarNombreProducto(categoriaDb);
+      if (c.startsWith("mujer")) return "Para ella";
+      if (c.startsWith("hombre")) return "Para él";
+      return "Para ella";
+    };
+
+    window.productos = productosDb.map((db) => {
+      const canon = nombreCanonicoProducto(db.nombre);
+      const fallback = fallbackByName.get(canon) || {};
+      const precio = Number(db.precio) || Number(fallback.precio) || 0;
+      const descuento = fallback.descuento || "10% OFF";
+      const precioOriginal = Number(fallback.precioOriginal) || Math.round(precio * 1.2);
+
+      return {
+        productoId: Number(db.id),
+        nombre: db.nombre || fallback.nombre || "Producto",
+        precio,
+        imagen: db.imagen_url || fallback.imagen || "images/perfume_232x210.png",
+        categoria: mapCategoriaDb(db.categoria),
+        descuento,
+        precioOriginal: Math.max(precio, precioOriginal),
+        rating: Number(fallback.rating) || 4.5,
+        reviews: Number(fallback.reviews) || 100,
+        descripcion: db.descripcion || fallback.descripcion || "",
+        stock: Math.max(0, Number(db.stock) || 0),
+      };
+    });
+
+    return true;
+  } catch (err) {
+    console.warn("No se pudo sincronizar productos desde backend:", err?.message || err);
+    return false;
+  }
+}
+
+window.syncProductosConBackend = syncProductosConBackend;
+
 function renderProductos() {
   const contenedor = document.getElementById('productos-lista');
   if (!contenedor) return;
@@ -318,6 +389,7 @@ function renderProductos() {
       const producto = productos[idx];
       console.log('Evento directo: Add to Cart clickeado:', producto.nombre);
       agregarAlCarrito({
+        productoId: producto.productoId,
         nombre: producto.nombre,
         precio: producto.precio,
         imagen: producto.imagen,

@@ -1,21 +1,14 @@
 // Script para poblar productos1.html dinámicamente desde window.productos
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
   // Verifica que window.productos esté disponible
   if (!window.productos) {
     console.error('No se encontró la lista de productos');
     return;
   }
-  // --- STOCK LOCALSTORAGE ---
-  // Leer stock guardado
-  let stockLS = localStorage.getItem('productos_stock');
-  if (stockLS) {
-    try {
-      stockLS = JSON.parse(stockLS);
-      window.productos.forEach((p, i) => {
-        if (stockLS[i] !== undefined) p.stock = stockLS[i];
-      });
-    } catch {}
+
+  if (typeof window.syncProductosConBackend === 'function') {
+    await window.syncProductosConBackend();
   }
 
   // Selecciona los contenedores

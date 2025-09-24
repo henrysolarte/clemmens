@@ -1,3 +1,8 @@
+const pagosIsProd = location.hostname.endsWith("onrender.com");
+const PAGOS_API_URL = pagosIsProd
+    ? "https://perfumeriaclemenss.onrender.com/api"
+    : (window.__API_URL__ || "http://localhost:3002/api");
+
 document.addEventListener("DOMContentLoaded", function() {
     // Mostrar producto seleccionado desde el carrito
     const productoInfo = document.getElementById("producto-info");
@@ -101,46 +106,68 @@ document.addEventListener("DOMContentLoaded", function() {
         return numeroOrden;
     }
 
+    async function confirmarCompraEnBackend(carrito) {
+        const items = carrito.map((p) => ({
+            productoId: p.productoId,
+            nombre: p.nombre,
+            cantidad: Number(p.cantidad) || 1,
+        }));
+
+        const res = await fetch(`${PAGOS_API_URL}/checkout`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ items }),
+        });
+
+        let data = null;
+        try {
+            data = await res.json();
+        } catch {}
+
+        if (!res.ok || data?.ok === false) {
+            const sinStock = Array.isArray(data?.sinStock) ? data.sinStock : [];
+            if (sinStock.length > 0) {
+                const detalle = sinStock
+                    .map((x) => `${x.nombre}: disponibles ${x.disponible}, solicitados ${x.solicitado}`)
+                    .join("\n");
+                throw new Error(`Stock insuficiente:\n${detalle}`);
+            }
+            throw new Error(data?.error || "No se pudo confirmar el pago.");
+        }
+    }
+
     let ordenNumero = document.getElementById("pago__orden");
     const botonpagos = document.getElementById("pagos__boton");
-    botonpagos.addEventListener("click", function(e) {
+    botonpagos.addEventListener("click", async function(e) {
         e.preventDefault();
         if (numeroTarjeta.value === "" || nombreTarjeta.value === "" || fechaExpiracion.value === "" || cvv.value === "") {
             alert("Por favor, complete todos los campos del formulario.");
             return;
         }
-        // Validar stock antes de pagar
+
         const carrito = JSON.parse(localStorage.getItem("carrito")) || [];
-        let stockLS = localStorage.getItem('productos_stock');
-        let stockArr = [];
-        if (stockLS) {
-            try {
-                stockArr = JSON.parse(stockLS);
-            } catch {}
+        if (carrito.length === 0) {
+            alert("Tu carrito esta vacio.");
+            return;
         }
-        let productosOk = true;
-        if (window.productos) {
-            for (let i = 0; i < carrito.length; i++) {
-                const idxGlobal = window.productos.findIndex(p => p.nombre === carrito[i].nombre);
-                if (idxGlobal !== -1 && carrito[i].cantidad > stockArr[idxGlobal]) {
-                    alert('No hay suficiente stock para ' + carrito[i].nombre + '. Solo quedan ' + stockArr[idxGlobal] + ' unidades.');
-                    productosOk = false;
-                    break;
-                }
-            }
-        }
-        if (!productosOk) return;
+
         const formulario = document.getElementById("pagos__formulario");
         const confirmacion = document.getElementById("pagos__confirmacion");
         botonpagos.disabled = true;
         botonpagos.textContent = "Procesando...";
-        const orden = guardarOrden(carrito);
-        setTimeout(() => {
+
+        try {
+            await confirmarCompraEnBackend(carrito);
+            const orden = guardarOrden(carrito);
             // Vacía el carrito después de pagar
             localStorage.removeItem("carrito");
             formulario.style.display = "none";
             confirmacion.style.display = "block";
             ordenNumero.textContent = "Número de orden: " + orden + "\nTotal pagado: $" + (window.totalPago ? window.totalPago.toLocaleString() : "0");
-        }, 3000);
+        } catch (err) {
+            alert(err.message || "No se pudo confirmar el pago.");
+            botonpagos.disabled = false;
+            botonpagos.textContent = "Pagar";
+        }
     })
 });
