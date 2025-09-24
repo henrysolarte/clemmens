@@ -123,7 +123,7 @@ window.productos = [
     descripcion: "Aroma fresco y floral, con notas de almizcle y flores blancas. Ideal para quienes buscan delicadeza y modernidad.",
     stock: 10
   },
-   /* {
+    {
     nombre: "360 para mujer",
     precio: 210000,
     imagen: "images/product-thumb-24.png",
@@ -134,7 +134,7 @@ window.productos = [
     reviews: 98,
     descripcion: "Perfume fresco y vibrante con notas florales y frutales. Ideal para mujeres modernas que buscan un aroma ligero y duradero.",
     stock: 10
-  },*/
+  },
   {
     nombre: "Le Male Elixir",
     precio: 400000,
