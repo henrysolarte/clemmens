@@ -8,6 +8,7 @@ server/.env
 
 # Local/editor/temp
 .codex_tmp/
+EduConnect/
 *.log
 
 # OS files
