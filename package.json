@@ -1,0 +1,14 @@
+{
+  "name": "clemenss-perfumeria-runner",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "back": "npm --prefix server start",
+    "front": "live-server --host=127.0.0.1 --port=5500 --open=/index.html .",
+    "dev": "concurrently -k -n BACK,FRONT -c green,blue \"npm:back\" \"npm:front\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.1",
+    "live-server": "^1.2.2"
+  }
+}

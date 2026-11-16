@@ -7,8 +7,8 @@
 const SESSION_KEY = "app.jwt";
 
 // Detectar entorno y fijar la URL de la API
-const isProd = location.hostname.endsWith("onrender.com");
-const API_URL = isProd
+const authIsProd = location.hostname.endsWith("onrender.com");
+const AUTH_API_URL = authIsProd
   ? "https://perfumeriaclemenss.onrender.com/api"
   : (window.__API_URL__ || "http://localhost:3002/api");
 
@@ -42,7 +42,7 @@ function borrarCarritoLocal() { localStorage.removeItem("carrito"); }
 
 // ----------------- API -----------------
 async function apiLogin(email, password, signal) {
-  const res = await fetch(`${API_URL}/login`, {
+  const res = await fetch(`${AUTH_API_URL}/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, password }),

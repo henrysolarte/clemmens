@@ -1,6 +1,11 @@
 // productos.js
 // Lista de perfumes Clemenss para mostrar en productos.html
 
+const productosIsProd = location.hostname.endsWith("onrender.com");
+const PRODUCTOS_API_URL = productosIsProd
+  ? "https://perfumeriaclemenss.onrender.com/api"
+  : (window.__API_URL__ || "http://localhost:3002/api");
+
 window.productos = [
   {
     nombre: "La Vie Est Belle",
@@ -11,7 +16,8 @@ window.productos = [
     precioOriginal: 350000,
     rating: 4.5,
     reviews: 222,
-    descripcion: "Una fragancia femenina, dulce y sofisticada, con notas de iris, jazmín y flor de azahar. Ideal para mujeres que buscan elegancia y alegría en cada aroma."
+    descripcion: "Una fragancia femenina, dulce y sofisticada, con notas de iris, jazmín y flor de azahar. Ideal para mujeres que buscan elegancia y alegría en cada aroma.",
+    stock: 10
   },
  
   {
@@ -23,7 +29,8 @@ window.productos = [
     precioOriginal: 330000,
     rating: 4.5,
     reviews: 41,
-    descripcion: "Explosión floral con matices de té y bergamota, envolvente y moderno. Perfecto para mujeres que desean destacar con un aroma vibrante y femenino."
+    descripcion: "Explosión floral con matices de té y bergamota, envolvente y moderno. Perfecto para mujeres que desean destacar con un aroma vibrante y femenino.",
+    stock: 10
   },
   {
     nombre: "Chanel No 5",
@@ -34,7 +41,8 @@ window.productos = [
     precioOriginal: 600000,
     rating: 4.5,
     reviews: 32,
-    descripcion: "El clásico eterno de Chanel, con notas de jazmín, rosa y aldehídos. Elegancia y sofisticación en cada gota, símbolo de la feminidad atemporal."
+    descripcion: "El clásico eterno de Chanel, con notas de jazmín, rosa y aldehídos. Elegancia y sofisticación en cada gota, símbolo de la feminidad atemporal.",
+    stock: 10
   },
   {
     nombre: "Good Girl",
@@ -45,7 +53,8 @@ window.productos = [
     precioOriginal: 540000,
     rating: 4.5,
     reviews: 222,
-    descripcion: "Una fragancia audaz y sensual, con notas de almendra, café y cacao. Para mujeres modernas y seguras que disfrutan de la dualidad entre lo dulce y lo intenso."
+    descripcion: "Una fragancia audaz y sensual, con notas de almendra, café y cacao. Para mujeres modernas y seguras que disfrutan de la dualidad entre lo dulce y lo intenso.",
+    stock: 10
   },
   {
     nombre: "Black Opium",
@@ -56,7 +65,8 @@ window.productos = [
     precioOriginal: 460000,
     rating: 4.5,
     reviews: 222,
-    descripcion: "Aroma oriental y vibrante, con café, vainilla y flores blancas. Perfecto para noches especiales y mujeres que buscan un toque misterioso."
+    descripcion: "Aroma oriental y vibrante, con café, vainilla y flores blancas. Perfecto para noches especiales y mujeres que buscan un toque misterioso.",
+    stock: 10
   },
   {
     nombre: "J'adore",
@@ -67,7 +77,8 @@ window.productos = [
     precioOriginal: 620000,
     rating: 4.5,
     reviews: 222,
-    descripcion: "Fragancia floral y luminosa, con notas de ylang-ylang, rosa y jazmín. Refleja la feminidad y el lujo en cada aplicación."
+    descripcion: "Fragancia floral y luminosa, con notas de ylang-ylang, rosa y jazmín. Refleja la feminidad y el lujo en cada aplicación.",
+    stock: 10
   },
   {
     nombre: "Sì (Giorgio Armani)",
@@ -78,7 +89,8 @@ window.productos = [
     precioOriginal: 480000,
     rating: 4.5,
     reviews: 222,
-    descripcion: "Notas de grosella negra, rosa y vainilla. Un perfume elegante y moderno para mujeres independientes y sofisticadas."
+    descripcion: "Notas de grosella negra, rosa y vainilla. Un perfume elegante y moderno para mujeres independientes y sofisticadas.",
+    stock: 10
   },
   {
     nombre: "Alien (Mugler)",
@@ -89,7 +101,8 @@ window.productos = [
     precioOriginal: 460000,
     rating: 4.5,
     reviews: 222,
-    descripcion: "Fragancia misteriosa y envolvente, con jazmín sambac y ámbar blanco. Ideal para quienes buscan un aroma único y fuera de lo común."
+    descripcion: "Fragancia misteriosa y envolvente, con jazmín sambac y ámbar blanco. Ideal para quienes buscan un aroma único y fuera de lo común.",
+    stock: 10
   },
   {
     nombre: "Portrait of a Lady",
@@ -100,7 +113,8 @@ window.productos = [
     precioOriginal: 620000,
     rating: 4.5,
     reviews: 222,
-    descripcion: "Rosa, especias y pachulí en una fragancia intensa y sofisticada. Para mujeres que buscan elegancia y carácter."
+    descripcion: "Rosa, especias y pachulí en una fragancia intensa y sofisticada. Para mujeres que buscan elegancia y carácter.",
+    stock: 10
   },
   {
     nombre: "Parfums de Marly Valaya",
@@ -111,9 +125,10 @@ window.productos = [
     precioOriginal: 490000,
     rating: 4.5,
     reviews: 222,
-    descripcion: "Aroma fresco y floral, con notas de almizcle y flores blancas. Ideal para quienes buscan delicadeza y modernidad."
+    descripcion: "Aroma fresco y floral, con notas de almizcle y flores blancas. Ideal para quienes buscan delicadeza y modernidad.",
+    stock: 10
   },
-   {
+    {
     nombre: "360 para mujer",
     precio: 210000,
     imagen: "images/product-thumb-24.png",
@@ -122,7 +137,8 @@ window.productos = [
     precioOriginal: 240000,
     rating: 4.3,
     reviews: 98,
-    descripcion: "Perfume fresco y vibrante con notas florales y frutales. Ideal para mujeres modernas que buscan un aroma ligero y duradero."
+    descripcion: "Perfume fresco y vibrante con notas florales y frutales. Ideal para mujeres modernas que buscan un aroma ligero y duradero.",
+    stock: 10
   },
   {
     nombre: "Le Male Elixir",
@@ -133,7 +149,8 @@ window.productos = [
     precioOriginal: 500000,
     rating: 4.5,
     reviews: 222,
-    descripcion: "Aroma masculino y seductor, con notas de lavanda, menta y vainilla. Para hombres que buscan destacar con personalidad y frescura."
+    descripcion: "Aroma masculino y seductor, con notas de lavanda, menta y vainilla. Para hombres que buscan destacar con personalidad y frescura.",
+    stock: 10
   },
   {
     nombre: "bleu de chanel",
@@ -144,7 +161,8 @@ window.productos = [
     precioOriginal: 650000,
     rating: 4.5,
     reviews: 222,
-    descripcion: "Fragancia fresca y amaderada, con notas de cítricos y sándalo. Elegancia y libertad para el hombre moderno."
+    descripcion: "Fragancia fresca y amaderada, con notas de cítricos y sándalo. Elegancia y libertad para el hombre moderno.",
+    stock: 10
   },
   {
     nombre: "One Millon",
@@ -155,7 +173,8 @@ window.productos = [
     precioOriginal: 680000,
     rating: 4.5,
     reviews: 222,
-    descripcion: "Aroma intenso y especiado, con mandarina, canela y cuero. Para hombres audaces y con espíritu ganador."
+    descripcion: "Aroma intenso y especiado, con mandarina, canela y cuero. Para hombres audaces y con espíritu ganador.",
+    stock: 10
   },
   {
     nombre: "Dior Sauvage",
@@ -166,7 +185,8 @@ window.productos = [
     precioOriginal: 480000,
     rating: 4.5,
     reviews: 222,
-    descripcion: "Fragancia fresca y salvaje, con bergamota y ambroxan. Inspirada en la naturaleza y la libertad masculina."
+    descripcion: "Fragancia fresca y salvaje, con bergamota y ambroxan. Inspirada en la naturaleza y la libertad masculina.",
+    stock: 10
   },
   {
     nombre: "Creed Aventus",
@@ -177,7 +197,8 @@ window.productos = [
     precioOriginal: 650000,
     rating: 4.5,
     reviews: 222,
-    descripcion: "Perfume sofisticado y potente, con piña, musgo y madera. Para líderes y hombres de éxito."
+    descripcion: "Perfume sofisticado y potente, con piña, musgo y madera. Para líderes y hombres de éxito.",
+    stock: 10
   },
   {
     nombre: "Acqua Di Gio Parfum",
@@ -188,7 +209,8 @@ window.productos = [
     precioOriginal: 600000,
     rating: 4.5,
     reviews: 222,
-    descripcion: "Aroma marino y fresco, con notas de bergamota y pachulí. Perfecto para el hombre activo y elegante."
+    descripcion: "Aroma marino y fresco, con notas de bergamota y pachulí. Perfecto para el hombre activo y elegante.",
+    stock: 10
   },
   {
     nombre: "Le Labo Santal 33",
@@ -199,7 +221,8 @@ window.productos = [
     precioOriginal: 650000,
     rating: 4.5,
     reviews: 222,
-    descripcion: "Fragancia unisex, amaderada y especiada, con sándalo y cardamomo. Para quienes buscan un aroma distintivo y moderno."
+    descripcion: "Fragancia unisex, amaderada y especiada, con sándalo y cardamomo. Para quienes buscan un aroma distintivo y moderno.",
+    stock: 10
   },
   {
     nombre: "Afnan 9pm",
@@ -210,7 +233,8 @@ window.productos = [
     precioOriginal: 365000,
     rating: 4.5,
     reviews: 180,
-    descripcion: "Aroma oriental y dulce, con notas de manzana, lavanda y vainilla. Ideal para noches especiales y hombres modernos."
+    descripcion: "Aroma oriental y dulce, con notas de manzana, lavanda y vainilla. Ideal para noches especiales y hombres modernos.",
+    stock: 10
   },
   {
     nombre: "Boss",
@@ -221,7 +245,8 @@ window.productos = [
     precioOriginal: 430000,
     rating: 4.5,
     reviews: 210,
-    descripcion: "Fragancia fresca y elegante, con notas de manzana, canela y sándalo. Para hombres seguros y sofisticados."
+    descripcion: "Fragancia fresca y elegante, con notas de manzana, canela y sándalo. Para hombres seguros y sofisticados.",
+    stock: 10
   },
   {
     nombre: "Eau De Cedrat",
@@ -232,9 +257,76 @@ window.productos = [
     precioOriginal: 365000,
     rating: 4.5,
     reviews: 95,
-    descripcion: "Aroma cítrico y vibrante, con notas de cedro y menta. Perfecto para el hombre activo y enérgico."
+    descripcion: "Aroma cítrico y vibrante, con notas de cedro y menta. Perfecto para el hombre activo y enérgico.",
+    stock: 10
   }
 ];
+
+function normalizarNombreProducto(nombre) {
+  return String(nombre || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "")
+    .trim();
+}
+
+function nombreCanonicoProducto(nombre) {
+  const normalizado = normalizarNombreProducto(nombre);
+  const alias = {
+    onemillon: 'onemillion',
+  };
+  return alias[normalizado] || normalizado;
+}
+
+async function syncProductosConBackend() {
+  try {
+    const res = await fetch(`${PRODUCTOS_API_URL}/perfumes`, { cache: "no-store" });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+    const data = await res.json();
+    const productosDb = Array.isArray(data?.productos) ? data.productos : [];
+    const fallbackByName = new Map(
+      window.productos.map((p) => [nombreCanonicoProducto(p.nombre), p])
+    );
+
+    const mapCategoriaDb = (categoriaDb) => {
+      const c = normalizarNombreProducto(categoriaDb);
+      if (c.startsWith("mujer")) return "Para ella";
+      if (c.startsWith("hombre")) return "Para él";
+      return "Para ella";
+    };
+
+    window.productos = productosDb.map((db) => {
+      const canon = nombreCanonicoProducto(db.nombre);
+      const fallback = fallbackByName.get(canon) || {};
+      const precio = Number(db.precio) || Number(fallback.precio) || 0;
+      const descuento = fallback.descuento || "10% OFF";
+      const precioOriginal = Number(fallback.precioOriginal) || Math.round(precio * 1.2);
+
+      return {
+        productoId: Number(db.id),
+        nombre: db.nombre || fallback.nombre || "Producto",
+        precio,
+        imagen: db.imagen_url || fallback.imagen || "images/perfume_232x210.png",
+        categoria: mapCategoriaDb(db.categoria),
+        descuento,
+        precioOriginal: Math.max(precio, precioOriginal),
+        rating: Number(fallback.rating) || 4.5,
+        reviews: Number(fallback.reviews) || 100,
+        descripcion: db.descripcion || fallback.descripcion || "",
+        stock: Math.max(0, Number(db.stock) || 0),
+      };
+    });
+
+    return true;
+  } catch (err) {
+    console.warn("No se pudo sincronizar productos desde backend:", err?.message || err);
+    return false;
+  }
+}
+
+window.syncProductosConBackend = syncProductosConBackend;
 
 function renderProductos() {
   const contenedor = document.getElementById('productos-lista');
@@ -297,6 +389,7 @@ function renderProductos() {
       const producto = productos[idx];
       console.log('Evento directo: Add to Cart clickeado:', producto.nombre);
       agregarAlCarrito({
+        productoId: producto.productoId,
         nombre: producto.nombre,
         precio: producto.precio,
         imagen: producto.imagen,

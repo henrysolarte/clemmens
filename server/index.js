@@ -15,14 +15,16 @@ app.use(express.json()); // Permite recibir JSON en el body
 /* ===== CORS: clemmens (Render) y localhost; preflight explícito ===== */
 const ALLOWED_ORIGINS = new Set([
   'https://clemmens.onrender.com',
-  'http://localhost:3000',
-  'http://127.0.0.1:3000',
 ]);
+
+function esOrigenLocalPermitido(origin) {
+  return /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(origin || '');
+}
 
 const corsOptions = {
   origin(origin, cb) {
     // Permite peticiones sin Origin (curl/health) y las de la lista
-    if (!origin || ALLOWED_ORIGINS.has(origin)) return cb(null, true);
+    if (!origin || ALLOWED_ORIGINS.has(origin) || esOrigenLocalPermitido(origin)) return cb(null, true);
     return cb(null, false);
   },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -80,6 +82,126 @@ app.get('/api/db-ping', async (_req, res) => {
   }
 });
 
+app.get('/api/perfumes', async (_req, res) => {
+  try {
+    const { rows } = await pool.query(`
+      SELECT id, nombre, marca, descripcion, precio, imagen_url, stock, categoria
+      FROM perfumes
+      ORDER BY id ASC
+    `);
+    res.json({ ok: true, productos: rows });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: e.message });
+  }
+});
+
+function normalizarNombreProducto(nombre) {
+  return String(nombre || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '')
+    .trim();
+}
+
+function nombreCanonicoProducto(nombre) {
+  const normalizado = normalizarNombreProducto(nombre);
+  const alias = {
+    onemillon: 'onemillion',
+  };
+  return alias[normalizado] || normalizado;
+}
+
+app.post('/api/checkout', async (req, res) => {
+  const items = Array.isArray(req.body?.items) ? req.body.items : [];
+  if (items.length === 0) {
+    return res.status(400).json({ ok: false, error: 'No hay items para procesar' });
+  }
+
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+
+    const { rows } = await client.query(
+      'SELECT id, nombre, stock FROM perfumes ORDER BY id ASC FOR UPDATE'
+    );
+
+    const byId = new Map(rows.map((p) => [Number(p.id), p]));
+    const byName = new Map(rows.map((p) => [nombreCanonicoProducto(p.nombre), p]));
+    const requeridoPorId = new Map();
+    const faltantes = [];
+
+    for (const item of items) {
+      const cantidad = Number(item?.cantidad);
+      if (!Number.isInteger(cantidad) || cantidad <= 0) {
+        await client.query('ROLLBACK');
+        return res.status(400).json({ ok: false, error: 'Cantidad invalida en el carrito' });
+      }
+
+      let producto = null;
+      const productoId = Number(item?.productoId);
+      if (Number.isInteger(productoId) && byId.has(productoId)) {
+        producto = byId.get(productoId);
+      } else if (item?.nombre) {
+        producto = byName.get(nombreCanonicoProducto(item.nombre)) || null;
+      }
+
+      if (!producto) {
+        faltantes.push({ nombre: item?.nombre || 'Producto desconocido' });
+        continue;
+      }
+
+      const actual = requeridoPorId.get(producto.id) || 0;
+      requeridoPorId.set(producto.id, actual + cantidad);
+    }
+
+    if (faltantes.length > 0) {
+      await client.query('ROLLBACK');
+      return res.status(409).json({
+        ok: false,
+        error: 'Hay productos que no existen en la base de datos',
+        faltantes,
+      });
+    }
+
+    const sinStock = [];
+    for (const [id, cantidad] of requeridoPorId.entries()) {
+      const producto = byId.get(id);
+      if (!producto) continue;
+      const stockActual = Number(producto.stock);
+      if (cantidad > stockActual) {
+        sinStock.push({
+          id,
+          nombre: producto.nombre,
+          solicitado: cantidad,
+          disponible: stockActual,
+        });
+      }
+    }
+
+    if (sinStock.length > 0) {
+      await client.query('ROLLBACK');
+      return res.status(409).json({
+        ok: false,
+        error: 'Stock insuficiente',
+        sinStock,
+      });
+    }
+
+    for (const [id, cantidad] of requeridoPorId.entries()) {
+      await client.query('UPDATE perfumes SET stock = stock - $1 WHERE id = $2', [cantidad, id]);
+    }
+
+    await client.query('COMMIT');
+    return res.json({ ok: true, message: 'Compra confirmada y stock actualizado' });
+  } catch (e) {
+    await client.query('ROLLBACK');
+    return res.status(500).json({ ok: false, error: e.message });
+  } finally {
+    client.release();
+  }
+});
+
 /* ===== Auth sencilla: register / login ===== */
 app.post('/api/register', async (req, res) => {
   try {
@@ -109,19 +231,34 @@ app.post('/api/register', async (req, res) => {
 
 app.post('/api/login', async (req, res) => {
   try {
-    const { email, password } = req.body || {};
+    let { email, password } = req.body || {};
+    email = typeof email === 'string' ? email.trim() : '';
+    password = typeof password === 'string' ? password : '';
     if (!email || !password) {
       return res.status(400).json({ error: 'Faltan credenciales' });
     }
     const { rows } = await pool.query(
-      'SELECT id, name, email, password_hash FROM users WHERE email = $1',
+      'SELECT id, name, email, password_hash FROM users WHERE LOWER(email) = LOWER($1)',
       [email]
     );
     if (rows.length === 0) {
       return res.status(401).json({ error: 'Credenciales inválidas' });
     }
     const user = rows[0];
-    const ok = await bcrypt.compare(password, user.password_hash);
+    let ok = false;
+    const hash = String(user.password_hash || '');
+
+    if (hash.startsWith('$2a$') || hash.startsWith('$2b$') || hash.startsWith('$2y$')) {
+      ok = await bcrypt.compare(password, hash);
+    } else {
+      // Compatibilidad temporal para usuarios legacy guardados en texto plano.
+      ok = password === hash;
+      if (ok) {
+        const newHash = await bcrypt.hash(password, 10);
+        await pool.query('UPDATE users SET password_hash = $1 WHERE id = $2', [newHash, user.id]);
+      }
+    }
+
     if (!ok) {
       return res.status(401).json({ error: 'Credenciales inválidas' });
     }
