@@ -90,15 +90,35 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 
-    function guardarOrden(carrito){
-        const numeroOrden = Math.floor(100000 + Math.random() * 900000);
-        const orden = {
-            items: carrito,
-            fecha: new Date().toISOString(),
-            id: numeroOrden,
-        };
-        localStorage.setItem("orden", JSON.stringify(orden));
-        return numeroOrden;
+    async function crearOrden(datosOrden) {
+        const token = localStorage.getItem("token");
+        if (!token) {
+            alert("Debes estar autenticado para realizar el pago.");
+            window.location.href = "login.html";
+            return null;
+        }
+
+        try {
+            const response = await fetch("http://localhost:8080/api/orders/create", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + token
+                },
+                body: JSON.stringify(datosOrden)
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.message || "Error al procesar el pago");
+            }
+
+            const orden = await response.json();
+            return orden;
+        } catch (error) {
+            console.error("Error en la petición:", error);
+            throw error;
+        }
     }
 
     let ordenNumero = document.getElementById("pago__orden");
@@ -109,18 +129,56 @@ document.addEventListener("DOMContentLoaded", function() {
             alert("Por favor, complete todos los campos del formulario.");
             return;
         }
+
+        const carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+        if (carrito.length === 0) {
+            alert("El carrito está vacío.");
+            return;
+        }
+
+        // Calcular subtotal e IVA
+        let subtotal = 0;
+        const items = carrito.map(prod => {
+            const itemTotal = (prod.precio || 0) * (prod.cantidad || 1);
+            subtotal += itemTotal;
+            return {
+                productId: prod.id,
+                quantity: prod.cantidad || 1,
+                unitPrice: prod.precio
+            };
+        });
+
+        const iva = subtotal * 0.19;
+        const totalAmount = subtotal + iva;
+
+        const datosOrden = {
+            items: items,
+            subtotal: subtotal,
+            iva: iva,
+            totalAmount: totalAmount,
+            cardNumber: numeroTarjeta.value.replace(/\s/g, ''),
+            cardholderName: nombreTarjeta.value,
+            expirationDate: fechaExpiracion.value,
+            cvv: cvv.value
+        };
+
         const formulario = document.getElementById("pagos__formulario");
         const confirmacion = document.getElementById("pagos__confirmacion");
         botonpagos.disabled = true;
         botonpagos.textContent = "Procesando...";
-        const carrito = JSON.parse(localStorage.getItem("carrito")) || [];
-        const orden = guardarOrden(carrito);
-        setTimeout(() => {
-            // Vacía el carrito después de pagar
-            localStorage.removeItem("carrito");
-            formulario.style.display = "none";
-            confirmacion.style.display = "block";
-            ordenNumero.textContent = "Número de orden: " + orden + "\nTotal pagado: $" + (window.totalPago ? window.totalPago.toLocaleString() : "0");
-        }, 3000);
+
+        crearOrden(datosOrden)
+            .then(orden => {
+                // Vacía el carrito después de pagar exitosamente
+                localStorage.removeItem("carrito");
+                formulario.style.display = "none";
+                confirmacion.style.display = "block";
+                ordenNumero.textContent = "Número de orden: " + orden.orderNumber + "\nTotal pagado: $" + (orden.totalAmount ? orden.totalAmount.toLocaleString() : "0");
+            })
+            .catch(error => {
+                alert("Error al procesar el pago: " + error.message);
+                botonpagos.disabled = false;
+                botonpagos.textContent = "Realizar Pago";
+            });
     })
 });

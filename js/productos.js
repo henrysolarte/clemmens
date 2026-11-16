@@ -323,10 +323,9 @@ function renderProductos() {
 
 function usuarioLogueado() {
   try {
-    const session = localStorage.getItem('app.jwt');
-    if (!session) return false;
-    const obj = JSON.parse(session);
-    return !!(obj && obj.user && obj.user.name);
+    const token = localStorage.getItem('token');
+    if (!token) return false;
+    return !!token;
   } catch {
     return false;
   }
