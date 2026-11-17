@@ -1,8 +1,3 @@
-const pagosIsProd = location.hostname.endsWith("onrender.com");
-const PAGOS_API_URL = pagosIsProd
-    ? "https://perfumeriaclemenss.onrender.com/api"
-    : (window.__API_URL__ || "http://localhost:3002/api");
-
 document.addEventListener("DOMContentLoaded", function() {
     // Mostrar producto seleccionado desde el carrito
     const productoInfo = document.getElementById("producto-info");
@@ -15,16 +10,16 @@ document.addEventListener("DOMContentLoaded", function() {
             const itemTotal = (producto.precio || 0) * (producto.cantidad || 1);
             total += itemTotal;
             productosHTML += `
-                <div class="producto-resumen">
-                    <img src="${producto.imagen || 'images/perfume_232x210.png'}" alt="${producto.nombre}">
-                    <p class="producto-nombre">${producto.nombre}</p>
-                    <p>Cantidad: ${producto.cantidad || 1}</p>
-                    <p class="producto-precio">Precio unitario: $${producto.precio ? producto.precio.toLocaleString() : '---'}</p>
-                    <p>Subtotal: $${itemTotal.toLocaleString()}</p>
+                <div class="producto-resumen" style="margin-bottom:20px; background:rgba(255,255,255,0.08); border-radius:12px; padding:16px; width:90%; max-width:400px; color:white;">
+                    <img src="${producto.imagen || 'images/perfume_232x210.png'}" alt="${producto.nombre}" style="width:100px; height:auto; margin-bottom:10px;">
+                    <p style="margin:0;"><strong>${producto.nombre}</strong></p>
+                    <p style="margin:0;">Cantidad: ${producto.cantidad || 1}</p>
+                    <p style="margin:0;">Precio unitario: $${producto.precio ? producto.precio.toLocaleString() : '---'}</p>
+                    <p style="margin:0;">Subtotal: $${itemTotal.toLocaleString()}</p>
                 </div>
             `;
         });
-        productosHTML += `<div class="total-pagar">TOTAL A PAGAR: $${total.toLocaleString()}</div>`;
+        productosHTML += `<div style="margin-top:20px; font-size:1.2em; color:#fff; font-weight:bold;">TOTAL A PAGAR: $${total.toLocaleString()}</div>`;
         productosHTML += '</div>';
         window.totalPago = total;
     } else {
@@ -95,50 +90,40 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 
-    function guardarOrden(carrito){
-        const numeroOrden = Math.floor(100000 + Math.random() * 900000);
-        const orden = {
-            items: carrito,
-            fecha: new Date().toISOString(),
-            id: numeroOrden,
-        };
-        localStorage.setItem("orden", JSON.stringify(orden));
-        return numeroOrden;
-    }
+    async function crearOrden(datosOrden) {
+        const token = localStorage.getItem("token");
+        if (!token) {
+            alert("Debes estar autenticado para realizar el pago.");
+            window.location.href = "login.html";
+            return null;
+        }
 
-    async function confirmarCompraEnBackend(carrito) {
-        const items = carrito.map((p) => ({
-            productoId: p.productoId,
-            nombre: p.nombre,
-            cantidad: Number(p.cantidad) || 1,
-        }));
-
-        const res = await fetch(`${PAGOS_API_URL}/checkout`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ items }),
-        });
-
-        let data = null;
         try {
-            data = await res.json();
-        } catch {}
+            const response = await fetch("http://localhost:8080/api/orders/create", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + token
+                },
+                body: JSON.stringify(datosOrden)
+            });
 
-        if (!res.ok || data?.ok === false) {
-            const sinStock = Array.isArray(data?.sinStock) ? data.sinStock : [];
-            if (sinStock.length > 0) {
-                const detalle = sinStock
-                    .map((x) => `${x.nombre}: disponibles ${x.disponible}, solicitados ${x.solicitado}`)
-                    .join("\n");
-                throw new Error(`Stock insuficiente:\n${detalle}`);
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.message || "Error al procesar el pago");
             }
-            throw new Error(data?.error || "No se pudo confirmar el pago.");
+
+            const orden = await response.json();
+            return orden;
+        } catch (error) {
+            console.error("Error en la petición:", error);
+            throw error;
         }
     }
 
     let ordenNumero = document.getElementById("pago__orden");
     const botonpagos = document.getElementById("pagos__boton");
-    botonpagos.addEventListener("click", async function(e) {
+    botonpagos.addEventListener("click", function(e) {
         e.preventDefault();
         if (numeroTarjeta.value === "" || nombreTarjeta.value === "" || fechaExpiracion.value === "" || cvv.value === "") {
             alert("Por favor, complete todos los campos del formulario.");
@@ -147,27 +132,53 @@ document.addEventListener("DOMContentLoaded", function() {
 
         const carrito = JSON.parse(localStorage.getItem("carrito")) || [];
         if (carrito.length === 0) {
-            alert("Tu carrito esta vacio.");
+            alert("El carrito está vacío.");
             return;
         }
+
+        // Calcular subtotal e IVA
+        let subtotal = 0;
+        const items = carrito.map(prod => {
+            const itemTotal = (prod.precio || 0) * (prod.cantidad || 1);
+            subtotal += itemTotal;
+            return {
+                productId: prod.id,
+                quantity: prod.cantidad || 1,
+                unitPrice: prod.precio
+            };
+        });
+
+        const iva = subtotal * 0.19;
+        const totalAmount = subtotal + iva;
+
+        const datosOrden = {
+            items: items,
+            subtotal: subtotal,
+            iva: iva,
+            totalAmount: totalAmount,
+            cardNumber: numeroTarjeta.value.replace(/\s/g, ''),
+            cardholderName: nombreTarjeta.value,
+            expirationDate: fechaExpiracion.value,
+            cvv: cvv.value
+        };
 
         const formulario = document.getElementById("pagos__formulario");
         const confirmacion = document.getElementById("pagos__confirmacion");
         botonpagos.disabled = true;
         botonpagos.textContent = "Procesando...";
 
-        try {
-            await confirmarCompraEnBackend(carrito);
-            const orden = guardarOrden(carrito);
-            // Vacía el carrito después de pagar
-            localStorage.removeItem("carrito");
-            formulario.style.display = "none";
-            confirmacion.style.display = "block";
-            ordenNumero.textContent = "Número de orden: " + orden + "\nTotal pagado: $" + (window.totalPago ? window.totalPago.toLocaleString() : "0");
-        } catch (err) {
-            alert(err.message || "No se pudo confirmar el pago.");
-            botonpagos.disabled = false;
-            botonpagos.textContent = "Pagar";
-        }
+        crearOrden(datosOrden)
+            .then(orden => {
+                // Vacía el carrito después de pagar exitosamente
+                localStorage.removeItem("carrito");
+                formulario.style.display = "none";
+                confirmacion.style.display = "block";
+                ordenNumero.textContent = "Número de orden: " + orden.orderNumber + "\nTotal pagado: $" + (orden.totalAmount ? orden.totalAmount.toLocaleString() : "0");
+            })
+            .catch(error => {
+                alert("Error al procesar el pago: " + error.message);
+                botonpagos.disabled = false;
+                botonpagos.textContent = "Realizar Pago";
+            });
     })
 });
