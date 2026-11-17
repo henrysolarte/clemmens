@@ -1,35 +1,10 @@
 // Script para poblar productos en index.html dinámicamente desde la API
 
-const API_URL = 'http://localhost:8081/api/products';
-let productosGlobal = [];
-
-async function cargarProductosDesdeAPI() {
-  try {
-    const response = await fetch(API_URL);
-    if (!response.ok) {
-      throw new Error(`Error al cargar productos: ${response.status}`);
-    }
-    const productos = await response.json();
-    // Guardar en window.productos para mantener compatibilidad
-    window.productos = productos;
-    productosGlobal = productos;
-    return productos;
-  } catch (error) {
-    console.error('Error cargando productos:', error);
-    // Fallback: usar los productos hardcodeados si la API no está disponible
-    if (window.productos && window.productos.length > 0) {
-      productosGlobal = window.productos;
-      return window.productos;
-    }
-    return [];
-  }
-}
-
 function renderizarProductosPorCategoria(categoria, contenedorId) {
   const contenedor = document.getElementById(contenedorId);
   if (!contenedor) return;
 
-  const productosFiltrados = productosGlobal.filter(p => p.category && p.category.name === categoria);
+  const productosFiltrados = window.productos.filter(p => p.categoria === categoria);
 
   if (productosFiltrados.length === 0) {
     contenedor.innerHTML = '<p class="text-center">No hay productos en esta categoría</p>';
@@ -37,60 +12,116 @@ function renderizarProductosPorCategoria(categoria, contenedorId) {
   }
 
   contenedor.innerHTML = productosFiltrados.map((producto, index) => {
-    const productoIndex = productosGlobal.findIndex(p => p.id === producto.id);
+    const productoIndex = window.productos.findIndex(p => p.id === producto.id);
+    const nombreEscapado = (producto.nombre || '').replace(/'/g, "\\'");
+    
     return `
-        <div class="col">
-          <div class="product-item">
-            <figure>
-              <a href="#" title="${producto.name}">
-                <img src="${producto.image || 'images/product-thumb-1.png'}" alt="${producto.name}" class="tab-image" data-index="${productoIndex}">
-              </a>
-            </figure>
-            <div class="d-flex flex-column text-center">
-              <h3 class="fs-6 fw-normal">${producto.name}</h3>
-              <div class="mb-2">
-                <span class="rating">
-                  ${'<svg width="18" height="18" class="text-warning"><use xlink:href="#star-full"></use></svg>'.repeat(Math.floor(producto.rating || 4))}${((producto.rating || 4) % 1 ? '<svg width="18" height="18" class="text-warning"><use xlink:href="#star-half"></use></svg>' : '')}
-                </span>
-                <span>(${producto.reviews || 0})</span>
-              </div>
-              <div class="d-flex justify-content-center align-items-center gap-2 mb-2">
-                <del>$${((producto.price || 0) * 1.2).toLocaleString('es-CO', {maximumFractionDigits: 0})}</del>
-                <span class="text-dark fw-semibold">$${(producto.price || 0).toLocaleString('es-CO', {maximumFractionDigits: 0})}</span>
-                <span class="badge border border-dark-subtle rounded-0 fw-normal px-1 fs-7 lh-1 text-body-tertiary">15% OFF</span>
-              </div>
-              <div class="button-area p-3 pt-0">
-                <div class="row g-1 mt-2">
-                  <div class="col-2"><a href="#" class="btn btn-outline-dark rounded-1 p-2 fs-6" data-index="${productoIndex}"><svg width="18" height="18"><use xlink:href='#heart'></use></svg></a></div>
-                  <div class="col-7">
-                    <button type="button" class="btn btn-primary rounded-1 p-2 fs-7 btn-cart" data-index="${productoIndex}">
-                      <svg width="18" height="18"><use xlink:href='#cart'></use></svg> Add to Cart
-                    </button>
-                  </div>
-                  <div class="col-2"><a href="#" class="btn btn-outline-dark rounded-1 p-2 fs-6" data-index="${productoIndex}"><svg width="18" height="18"><use xlink:href='#heart'></use></svg></a></div>
+      <div class="col">
+        <div class="product-item">
+          <figure>
+            <a href="#" title="${producto.nombre}" onclick="event.preventDefault();showProductModal('${nombreEscapado}')">
+              <img src="${producto.imagen}" alt="${producto.nombre}" class="tab-image" data-index="${productoIndex}">
+            </a>
+          </figure>
+          <div class="d-flex flex-column text-center">
+            <h3 class="fs-6 fw-normal">${producto.nombre}</h3>
+            <div class="mb-2">
+              <span class="rating">
+                ${'<svg width="18" height="18" class="text-warning"><use xlink:href="#star-full"></use></svg>'.repeat(Math.floor(producto.rating || 4))}${((producto.rating || 4) % 1 ? '<svg width="18" height="18" class="text-warning"><use xlink:href="#star-half"></use></svg>' : '')}
+              </span>
+              <span>(${producto.reviews || 0})</span>
+            </div>
+            <div class="d-flex justify-content-center align-items-center gap-2 mb-2">
+              <span class="text-dark fw-semibold">$${(producto.precio || 0).toLocaleString('es-CO', {maximumFractionDigits: 0})}</span>
+            </div>
+            <div class="button-area p-3 pt-0">
+              <div class="row g-1 mt-2">
+                <div class="col-12">
+                  <button type="button" class="btn btn-primary rounded-1 p-2 fs-7 btn-add-to-cart" data-index="${productoIndex}" data-nombre="${nombreEscapado}" data-precio="${producto.precio}">
+                    <svg width="18" height="18"><use xlink:href='#cart'></use></svg> Agregar al carrito
+                  </button>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      `;
+      </div>
+    `;
   }).join('');
 }
 
+function renderizarMasVendidos(contenedorId, limite = 12) {
+  const contenedor = document.getElementById(contenedorId);
+  if (!contenedor) return;
+
+  // Ordenar por número de reviews (como proxy de "más vendidos")
+  const masVendidos = [...window.productos]
+    .sort((a, b) => (b.reviews || 0) - (a.reviews || 0))
+    .slice(0, limite);
+
+  contenedor.innerHTML = `
+    <div class="swiper-wrapper">
+      ${masVendidos.map((producto, index) => {
+        const productoIndex = window.productos.findIndex(p => p.id === producto.id);
+        const nombreEscapado = (producto.nombre || '').replace(/'/g, "\\'");
+        
+        return `
+      <a href="#" class="nav-link swiper-slide text-center" onclick="event.preventDefault();showProductModal('${nombreEscapado}')">
+        <img src="${producto.imagen}" class="rounded-circle" alt="${producto.nombre}">
+        <h4 class="fs-6 mt-3 fw-normal category-title">${producto.nombre}</h4>
+      </a>
+    `;
+      }).join('')}
+    </div>
+  `;
+}
+
 document.addEventListener('DOMContentLoaded', async function() {
-  // Cargar productos desde la API
-  await cargarProductosDesdeAPI();
+  // Esperar a que los productos estén cargados
+  if (!window.productos || window.productos.length === 0) {
+    // Esperar al evento productosListos
+    await new Promise((resolve) => {
+      const handleProductosListos = () => {
+        document.removeEventListener('productosListos', handleProductosListos);
+        resolve();
+      };
+      document.addEventListener('productosListos', handleProductosListos);
+      
+      // Timeout de seguridad de 10 segundos
+      setTimeout(resolve, 10000);
+    });
+  }
+
+  if (!window.productos || window.productos.length === 0) {
+    console.warn('No se pudieron cargar los productos');
+    return;
+  }
+
+  if (typeof window.syncProductosConBackend === 'function') {
+    await window.syncProductosConBackend();
+  }
 
   renderizarProductosPorCategoria('Para ella', 'product-grid-ella');
   renderizarProductosPorCategoria('Para él', 'product-grid-el');
+  renderizarMasVendidos('mas-vendidos-wrapper', 12); // Cargar los 12 más vendidos
 
-  // Delegación de eventos para botones "Add to Cart"
+  // Agregar estilos hover a los botones
+  const style = document.createElement('style');
+  style.textContent = `
+    .btn-add-to-cart:hover:not(:disabled) {
+      background-color: #0d6efd;
+      transform: translateY(-2px);
+    }
+  `;
+  document.head.appendChild(style);
+
+  // Delegación de eventos para botones "Agregar al carrito"
   document.body.addEventListener('click', function(e) {
-    if (e.target.closest('.btn-cart')) {
+    if (e.target.closest('.btn-add-to-cart')) {
       e.preventDefault();
-      const button = e.target.closest('.btn-cart');
+      const button = e.target.closest('.btn-add-to-cart');
       const productoIndex = button.dataset.index;
-      const producto = productosGlobal[productoIndex];
+      const producto = window.productos[productoIndex];
 
       if (producto) {
         if (!usuarioLogueado()) {
@@ -99,15 +130,12 @@ document.addEventListener('DOMContentLoaded', async function() {
           return;
         }
 
-        const card = button.closest('.product-item');
-        const cantidadInput = card.querySelector('input.quantity');
-        const cantidad = cantidadInput ? parseInt(cantidadInput.value, 10) || 1 : 1;
-
         agregarAlCarrito({
-          nombre: producto.name,
-          precio: producto.price,
-          imagen: producto.image || 'images/product-thumb-1.png',
-          cantidad: cantidad
+          id: producto.id,
+          nombre: producto.nombre,
+          precio: producto.precio,
+          imagen: producto.imagen,
+          cantidad: 1
         });
       }
     }
