@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test API</title>
+    <style>
+        body { font-family: monospace; margin: 20px; }
+        .success { color: green; }
+        .error { color: red; }
+        pre { background: #f0f0f0; padding: 10px; overflow: auto; }
+    </style>
+</head>
+<body>
+    <h1>Test API Products</h1>
+    <div id="result"></div>
+    
+    <script>
+        const apiUrl = 'https://e-commerce-fr3k.onrender.com/api/products';
+        const results = [];
+        
+        function log(msg) {
+            console.log(msg);
+            results.push(msg);
+        }
+        
+        log('=== API Test Started ===');
+        log('Frontend hostname: ' + window.location.hostname);
+        log('Fetching from: ' + apiUrl);
+        
+        fetch(apiUrl, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+            .then(response => {
+                log('Response status: ' + response.status);
+                log('Response ok: ' + response.ok);
+                log('Response type: ' + response.type);
+                log('CORS headers:');
+                log('  Access-Control-Allow-Origin: ' + response.headers.get('Access-Control-Allow-Origin'));
+                return response.json();
+            })
+            .then(data => {
+                log('SUCCESS! Received ' + data.length + ' products');
+                log('First product: ' + JSON.stringify(data[0], null, 2));
+                
+                document.getElementById('result').innerHTML = `
+                    <p class="success">✓ API Connection Successful!</p>
+                    <p>Received ${data.length} products from the database</p>
+                    <pre>${results.join('\n')}</pre>
+                    <h3>Sample Product:</h3>
+                    <pre>${JSON.stringify(data[0], null, 2)}</pre>
+                `;
+            })
+            .catch(error => {
+                log('ERROR: ' + error.message);
+                log('Stack: ' + error.stack);
+                
+                document.getElementById('result').innerHTML = `
+                    <p class="error">✗ API Connection Failed!</p>
+                    <pre>${results.join('\n')}</pre>
+                    <p class="error">${error.message}</p>
+                `;
+            });
+    </script>
+</body>
+</html>
